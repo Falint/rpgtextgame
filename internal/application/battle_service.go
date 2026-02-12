@@ -21,24 +21,37 @@ const (
 	BattleEscaped
 )
 
+// battleLogCapacity is the maximum number of log entries retained in memory.
+const battleLogCapacity = 20
+
 // BattleService handles combat logic.
+// It manages turn order, damage calculations, and victory/defeat conditions.
+// Item effect application is delegated to the centralized ItemService.
 type BattleService struct {
-	player   *domain.Player
-	enemy    *domain.Enemy
-	monsters *registry.MonsterRegistry
-	items    *registry.ItemRegistry
-	state    BattleState
-	log      []string
+	player      *domain.Player
+	enemy       *domain.Enemy
+	monsters    *registry.MonsterRegistry
+	items       *registry.ItemRegistry
+	itemService *ItemService // Centralized item effect processor
+	state       BattleState
+	log         []string
 }
 
 // NewBattleService creates a battle service.
-func NewBattleService(player *domain.Player, monsters *registry.MonsterRegistry, items *registry.ItemRegistry) *BattleService {
+// itemService is the shared, centralized item effect processor.
+func NewBattleService(
+	player *domain.Player,
+	monsters *registry.MonsterRegistry,
+	items *registry.ItemRegistry,
+	itemService *ItemService,
+) *BattleService {
 	return &BattleService{
-		player:   player,
-		monsters: monsters,
-		items:    items,
-		state:    BattleNone,
-		log:      make([]string, 0, 20),
+		player:      player,
+		monsters:    monsters,
+		items:       items,
+		itemService: itemService,
+		state:       BattleNone,
+		log:         make([]string, 0, battleLogCapacity),
 	}
 }
 
@@ -124,39 +137,38 @@ func (b *BattleService) Attack() {
 
 // UseItem uses a consumable from inventory.
 func (b *BattleService) UseItem(slotIndex int) bool {
+	// Guard: only allow item usage during player's turn
 	if b.state != BattlePlayerTurn {
 		return false
 	}
 
+	// Validate slot contains a consumable item
 	slot := b.player.Inventory.GetSlot(slotIndex)
 	if slot == nil || slot.Type != domain.SlotItem {
 		return false
 	}
-
-	item := slot.Item
-	if item.Category != domain.ItemConsumable {
+	if slot.Item.Category != domain.ItemConsumable {
 		return false
 	}
 
-	// Apply effect
-	switch item.ConsumableType {
-	case domain.ConsumeHeal:
-		b.player.Heal(item.Value)
-		b.addLog(fmt.Sprintf("Used %s! Restored %d HP.", item.Name, item.Value))
-	case domain.ConsumeBuffAtk:
-		b.player.AddBuff(domain.BuffAttack, item.Value, item.Duration)
-		b.addLog(fmt.Sprintf("Used %s! ATK +%d%% for %d turns.", item.Name, item.Value, item.Duration))
-	case domain.ConsumeBuffDef:
-		b.player.AddBuff(domain.BuffDefense, item.Value, item.Duration)
-		b.addLog(fmt.Sprintf("Used %s! DEF +%d%% for %d turns.", item.Name, item.Value, item.Duration))
-	case domain.ConsumeFullRestore:
-		b.player.CurrentHP = b.player.MaxHP
-		b.addLog(fmt.Sprintf("Used %s! Fully restored!", item.Name))
+	// Delegate effect application to the centralized ItemService.
+	// This ensures consistent behavior between battle and inventory usage.
+	result := b.itemService.UseConsumable(slot.Item)
+
+	if !result.Success {
+		// Item effect was rejected (e.g., HP already full).
+		// Log the reason but do NOT consume the item or end the turn.
+		b.addLog(result.Error)
+		return false
 	}
 
-	// Remove item
+	// Effect applied successfully — log the result message
+	b.addLog(result.Message)
+
+	// Remove the consumed item from the inventory slot
 	b.player.Inventory.RemoveItem(slotIndex, 1)
 
+	// End player's turn and trigger enemy response
 	b.state = BattleEnemyTurn
 	b.enemyTurn()
 	return true
@@ -245,7 +257,7 @@ func (b *BattleService) IsBattleOver() bool {
 
 func (b *BattleService) addLog(msg string) {
 	b.log = append(b.log, msg)
-	if len(b.log) > 20 {
+	if len(b.log) > battleLogCapacity {
 		b.log = b.log[1:]
 	}
 }
