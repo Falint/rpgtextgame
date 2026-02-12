@@ -11,11 +11,14 @@ import (
 )
 
 // AppModel is the main BubbleTea model.
+// It holds all services, registries, and UI components, and routes
+// input to the active screen or menu.
 type AppModel struct {
 	// Domain & Services
 	player        *domain.Player
 	shopService   *application.ShopService
 	battleService *application.BattleService
+	itemService   *application.ItemService // Shared item effect processor
 
 	// Registries
 	weapons  *registry.WeaponRegistry
@@ -36,11 +39,12 @@ type AppModel struct {
 	focusedPanel int
 }
 
-// NewAppModel creates the initial model.
+// NewAppModel creates the initial model with all services and registries injected.
 func NewAppModel(
 	player *domain.Player,
 	shopService *application.ShopService,
 	battleService *application.BattleService,
+	itemService *application.ItemService,
 	weapons *registry.WeaponRegistry,
 	items *registry.ItemRegistry,
 	monsters *registry.MonsterRegistry,
@@ -50,6 +54,7 @@ func NewAppModel(
 		player:        player,
 		shopService:   shopService,
 		battleService: battleService,
+		itemService:   itemService,
 		weapons:       weapons,
 		items:         items,
 		monsters:      monsters,
@@ -57,7 +62,7 @@ func NewAppModel(
 
 		menu:         components.NewMenu(),
 		character:    components.NewCharacter(player),
-		activeScreen: nil, // Initially empty or welcome
+		activeScreen: nil,
 
 		focusedPanel: PanelMenu,
 	}

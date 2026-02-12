@@ -26,8 +26,8 @@ func main() {
 	giveStartingItems(player, items, weapons)
 
 	// 3. Initialize Application Services
-	battleService := application.NewBattleService(player, monsters, items)
-	// Check shop config: shop depends on registries too
+	itemService := application.NewItemService(player)
+	battleService := application.NewBattleService(player, monsters, items, itemService)
 	shopService := application.NewShopService(player, weapons, items)
 
 	// 4. Initialize UI (BubbleTea)
@@ -35,6 +35,7 @@ func main() {
 		player,
 		shopService,
 		battleService,
+		itemService,
 		weapons,
 		items,
 		monsters,
