@@ -7,6 +7,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/tenyom/textrpg-tui/internal/application"
 	"github.com/tenyom/textrpg-tui/internal/domain"
 	"github.com/tenyom/textrpg-tui/internal/tui/styles"
 )
@@ -31,22 +32,27 @@ const (
 )
 
 // InventoryScreen implements the inventory screen.
+// It displays the player's items and delegates consumable usage
+// to the centralized ItemService for consistent effect handling.
 type InventoryScreen struct {
-	player   *domain.Player
-	mode     InventoryMode
-	cursor   int
-	width    int
-	height   int
-	message  string
-	msgStyle string
+	player      *domain.Player
+	itemService *application.ItemService // Centralized item effect processor
+	mode        InventoryMode
+	cursor      int
+	width       int
+	height      int
+	message     string
+	msgStyle    string
 }
 
 // NewInventoryScreen creates a new inventory screen.
-func NewInventoryScreen(player *domain.Player) *InventoryScreen {
+// itemService must be the same shared instance used by BattleService.
+func NewInventoryScreen(player *domain.Player, itemService *application.ItemService) *InventoryScreen {
 	return &InventoryScreen{
-		player: player,
-		mode:   InventoryModeMain,
-		cursor: 0,
+		player:      player,
+		itemService: itemService,
+		mode:        InventoryModeMain,
+		cursor:      0,
 	}
 }
 
@@ -124,54 +130,57 @@ func (s *InventoryScreen) handleSelect() tea.Cmd {
 	return nil
 }
 
-// handleUseItem uses the selected consumable.
+// handleUseItem uses the selected consumable via the centralized ItemService.
+// This ensures consistent behavior with battle item usage (same validation,
+// same effect logic, same HP-full check).
 func (s *InventoryScreen) handleUseItem() {
 	consumables := s.player.Inventory.GetConsumables()
 	if len(consumables) == 0 {
+		s.message = "No consumables available."
+		s.msgStyle = "error"
 		return
 	}
 	s.clampCursor(len(consumables))
 
 	slot := consumables[s.cursor]
-
-	// Create temp item to use logic (missing domain method for now, just simulating)
-	// Real implementation would call a service or domain method
 	item := slot.Item
 
-	used := false
-	switch item.ConsumableType {
-	case domain.ConsumeHeal:
-		if s.player.CurrentHP < s.player.MaxHP {
-			oldHP := s.player.CurrentHP
-			s.player.CurrentHP += item.Value
-			if s.player.CurrentHP > s.player.MaxHP {
-				s.player.CurrentHP = s.player.MaxHP
-			}
-			s.message = fmt.Sprintf("Recovered %d HP!", s.player.CurrentHP-oldHP)
-			used = true
-		} else {
-			s.message = "HP is already full!"
-			s.msgStyle = "error"
-		}
-	case domain.ConsumeFullRestore:
-		if s.player.CurrentHP < s.player.MaxHP {
-			s.player.CurrentHP = s.player.MaxHP
-			s.message = "Fully restored!"
-			used = true
-		} else {
-			s.message = "HP is already full!"
-			s.msgStyle = "error"
-		}
-	case domain.ConsumeBuffAtk, domain.ConsumeBuffDef:
-		// Logic would go here
-		s.message = fmt.Sprintf("Used %s!", item.Name)
-		used = true
+	// Delegate to ItemService — single source of truth for item effects
+	result := s.itemService.UseConsumable(item)
+
+	if !result.Success {
+		// Effect was rejected (e.g., HP full). Show error, do NOT remove item.
+		s.message = result.Error
+		s.msgStyle = "error"
+		return
 	}
 
-	if used {
-		s.msgStyle = "success"
-		s.player.Inventory.RemoveItemByID(item.ID, 1)
+	// Effect applied — remove one unit from inventory.
+	// Find the actual slot index for this consumable to remove correctly.
+	slotIndex := s.findConsumableSlotIndex(s.cursor)
+	if slotIndex != -1 {
+		s.player.Inventory.RemoveItem(slotIndex, 1)
 	}
+
+	// Display success message
+	s.message = result.Message
+	s.msgStyle = "success"
+}
+
+// findConsumableSlotIndex returns the inventory slot index of the Nth consumable.
+// This is necessary because consumables are a filtered view of the full inventory.
+func (s *InventoryScreen) findConsumableSlotIndex(n int) int {
+	count := 0
+	for i := 0; i < domain.MaxInventorySlots; i++ {
+		slot := s.player.Inventory.GetSlot(i)
+		if slot != nil && slot.Type == domain.SlotItem && slot.Item.Category == domain.ItemConsumable {
+			if count == n {
+				return i
+			}
+			count++
+		}
+	}
+	return -1
 }
 
 // View renders the screen.

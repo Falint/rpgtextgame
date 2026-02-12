@@ -93,7 +93,7 @@ func (m *AppModel) handleMenuSelect(id string) tea.Cmd {
 		m.activeScreen = screens.NewEquipScreen(m.player)
 		m.focusGame()
 	case components.MenuInventory:
-		m.activeScreen = screens.NewInventoryScreen(m.player)
+		m.activeScreen = screens.NewInventoryScreen(m.player, m.itemService)
 		m.focusGame()
 	case components.MenuStatus:
 		m.activeScreen = screens.NewStatusScreen(m.player)
