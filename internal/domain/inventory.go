@@ -17,6 +17,12 @@ const (
 	SlotItem
 )
 
+// Inventory capacity and stacking limits.
+const (
+	MaxInventorySlots = 20 // Default inventory size (matches C version)
+	MaxItemStackSize  = 99 // Maximum quantity per stackable item slot
+)
+
 // Item represents a consumable or material.
 type Item struct {
 	ID             string
@@ -86,8 +92,8 @@ func (inv *Inventory) AddItem(item *Item, qty int) ResultCode {
 		for i := range inv.Slots {
 			if inv.Slots[i].Type == SlotItem && inv.Slots[i].Item.ID == item.ID {
 				inv.Slots[i].Quantity += qty
-				if inv.Slots[i].Quantity > 99 {
-					inv.Slots[i].Quantity = 99
+				if inv.Slots[i].Quantity > MaxItemStackSize {
+					inv.Slots[i].Quantity = MaxItemStackSize
 				}
 				return ResultSuccess
 			}
@@ -270,6 +276,3 @@ func (inv *Inventory) GetMaterials() []MaterialInfo {
 	}
 	return materials
 }
-
-// MaxInventorySlots is the default inventory size.
-const MaxInventorySlots = 20

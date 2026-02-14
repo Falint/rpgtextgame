@@ -5,6 +5,9 @@ import (
 	"github.com/tenyom/textrpg-tui/internal/infrastructure/registry"
 )
 
+// DefaultSellRatio is the fraction of base sell price the player receives.
+const DefaultSellRatio = 0.5
+
 // ShopService handles buying and selling.
 type ShopService struct {
 	player    *domain.Player
@@ -19,7 +22,7 @@ func NewShopService(player *domain.Player, weapons *registry.WeaponRegistry, ite
 		player:    player,
 		weapons:   weapons,
 		items:     items,
-		sellRatio: 0.5,
+		sellRatio: DefaultSellRatio,
 	}
 }
 

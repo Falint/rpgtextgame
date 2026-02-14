@@ -45,9 +45,9 @@ func (e *Enemy) IsAlive() bool {
 // TakeDamage applies damage to the enemy.
 // Returns true if enemy died.
 func (e *Enemy) TakeDamage(amount int) bool {
-	reduced := amount - int(float64(e.Defense)*0.5)
-	if reduced < 1 {
-		reduced = 1
+	reduced := amount - int(float64(e.Defense)*DefenseReductionRatio)
+	if reduced < MinDamage {
+		reduced = MinDamage
 	}
 	e.CurrentHP -= reduced
 	if e.CurrentHP < 0 {

@@ -4,36 +4,14 @@ package registry
 
 import "github.com/tenyom/textrpg-tui/internal/domain"
 
-// ItemCategory for item types.
-// EXACT MATCH: C src/core/item.h ItemCategory enum
-type ItemCategory int
-
-const (
-	CategoryConsumable ItemCategory = iota
-	CategoryMaterial
-)
-
-// ConsumableType for consumable effects.
-// EXACT MATCH: C src/core/item.h ConsumableType enum
-type ConsumableType int
-
-const (
-	ConsumableNone ConsumableType = iota
-	ConsumableHeal
-	ConsumableBuffAtk
-	ConsumableBuffDef
-	ConsumableCurePoison
-	ConsumableFullRestore
-)
-
 // ItemTemplate is a read-only item definition.
 // EXACT MATCH: C src/data/items.h ItemTemplate struct
 type ItemTemplate struct {
 	ID             string
 	Name           string
 	Description    string
-	Category       ItemCategory
-	ConsumableType ConsumableType
+	Category       domain.ItemCategory
+	ConsumableType domain.ConsumableType
 	Value          int // heal amount, buff %, etc
 	Duration       int // buff duration in turns
 	BuyPrice       int // 0 = not buyable
@@ -47,8 +25,8 @@ func (t *ItemTemplate) ToItem() *domain.Item {
 		ID:             t.ID,
 		Name:           t.Name,
 		Description:    t.Description,
-		Category:       domain.ItemCategory(t.Category),
-		ConsumableType: domain.ConsumableType(t.ConsumableType),
+		Category:       t.Category,
+		ConsumableType: t.ConsumableType,
 		Value:          t.Value,
 		Duration:       t.Duration,
 		BuyPrice:       t.BuyPrice,
@@ -84,29 +62,29 @@ func (r *ItemRegistry) loadItems() {
 		{
 			ID: "small_potion", Name: "Small Potion",
 			Description:    "A basic healing potion. Restores 30 HP.",
-			Category:       CategoryConsumable,
-			ConsumableType: ConsumableHeal,
+			Category:       domain.ItemConsumable,
+			ConsumableType: domain.ConsumeHeal,
 			Value:          30, Duration: 0, BuyPrice: 25, SellPrice: 10, Stackable: true,
 		},
 		{
 			ID: "medium_potion", Name: "Medium Potion",
 			Description:    "A standard healing potion. Restores 60 HP.",
-			Category:       CategoryConsumable,
-			ConsumableType: ConsumableHeal,
+			Category:       domain.ItemConsumable,
+			ConsumableType: domain.ConsumeHeal,
 			Value:          60, Duration: 0, BuyPrice: 50, SellPrice: 20, Stackable: true,
 		},
 		{
 			ID: "large_potion", Name: "Large Potion",
 			Description:    "A powerful healing potion. Restores 100 HP.",
-			Category:       CategoryConsumable,
-			ConsumableType: ConsumableHeal,
+			Category:       domain.ItemConsumable,
+			ConsumableType: domain.ConsumeHeal,
 			Value:          100, Duration: 0, BuyPrice: 100, SellPrice: 40, Stackable: true,
 		},
 		{
 			ID: "full_restore", Name: "Full Restore",
 			Description:    "Completely restores HP and cures all status.",
-			Category:       CategoryConsumable,
-			ConsumableType: ConsumableFullRestore,
+			Category:       domain.ItemConsumable,
+			ConsumableType: domain.ConsumeFullRestore,
 			Value:          999, Duration: 0, BuyPrice: 300, SellPrice: 120, Stackable: true,
 		},
 
@@ -116,36 +94,36 @@ func (r *ItemRegistry) loadItems() {
 		{
 			ID: "atk_elixir", Name: "Attack Elixir",
 			Description:    "Boosts ATK by 25% for 3 turns.",
-			Category:       CategoryConsumable,
-			ConsumableType: ConsumableBuffAtk,
+			Category:       domain.ItemConsumable,
+			ConsumableType: domain.ConsumeBuffAtk,
 			Value:          25, Duration: 3, BuyPrice: 60, SellPrice: 25, Stackable: true,
 		},
 		{
 			ID: "def_elixir", Name: "Defense Elixir",
 			Description:    "Boosts DEF by 25% for 3 turns.",
-			Category:       CategoryConsumable,
-			ConsumableType: ConsumableBuffDef,
+			Category:       domain.ItemConsumable,
+			ConsumableType: domain.ConsumeBuffDef,
 			Value:          25, Duration: 3, BuyPrice: 60, SellPrice: 25, Stackable: true,
 		},
 		{
 			ID: "power_surge", Name: "Power Surge",
 			Description:    "Massive ATK boost of 50% for 2 turns.",
-			Category:       CategoryConsumable,
-			ConsumableType: ConsumableBuffAtk,
+			Category:       domain.ItemConsumable,
+			ConsumableType: domain.ConsumeBuffAtk,
 			Value:          50, Duration: 2, BuyPrice: 120, SellPrice: 50, Stackable: true,
 		},
 		{
 			ID: "iron_skin", Name: "Iron Skin Potion",
 			Description:    "Massive DEF boost of 50% for 2 turns.",
-			Category:       CategoryConsumable,
-			ConsumableType: ConsumableBuffDef,
+			Category:       domain.ItemConsumable,
+			ConsumableType: domain.ConsumeBuffDef,
 			Value:          50, Duration: 2, BuyPrice: 120, SellPrice: 50, Stackable: true,
 		},
 		{
 			ID: "antidote", Name: "Antidote",
 			Description:    "Cures poison status.",
-			Category:       CategoryConsumable,
-			ConsumableType: ConsumableCurePoison,
+			Category:       domain.ItemConsumable,
+			ConsumableType: domain.ConsumeNone,
 			Value:          0, Duration: 0, BuyPrice: 30, SellPrice: 12, Stackable: true,
 		},
 
@@ -155,37 +133,37 @@ func (r *ItemRegistry) loadItems() {
 		{
 			ID: "slime_gel", Name: "Slime Gel",
 			Description: "Gooey substance from slimes. Used for crafting.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 15, Stackable: true,
 		},
 		{
 			ID: "goblin_fang", Name: "Goblin Fang",
 			Description: "Sharp fang from a goblin.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 20, Stackable: true,
 		},
 		{
 			ID: "bat_wing", Name: "Bat Wing",
 			Description: "Leathery wing from a cave bat.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 12, Stackable: true,
 		},
 		{
 			ID: "wolf_pelt", Name: "Wolf Pelt",
 			Description: "Rugged fur from a wild wolf.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 25, Stackable: true,
 		},
 		{
 			ID: "wolf_fang", Name: "Wolf Fang",
 			Description: "Sharp fang from a wild wolf.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 18, Stackable: true,
 		},
 		{
 			ID: "bone_fragment", Name: "Bone Fragment",
 			Description: "Piece of ancient bone.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 22, Stackable: true,
 		},
 
@@ -195,55 +173,55 @@ func (r *ItemRegistry) loadItems() {
 		{
 			ID: "fire_essence", Name: "Fire Essence",
 			Description: "Burning core of a fire creature.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 80, Stackable: true,
 		},
 		{
 			ID: "water_essence", Name: "Water Essence",
 			Description: "Crystallized water magic.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 80, Stackable: true,
 		},
 		{
 			ID: "earth_essence", Name: "Earth Essence",
 			Description: "Condensed earth energy.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 80, Stackable: true,
 		},
 		{
 			ID: "wind_essence", Name: "Wind Essence",
 			Description: "Captured wind spirit energy.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 80, Stackable: true,
 		},
 		{
 			ID: "ember_stone", Name: "Ember Stone",
 			Description: "A stone that glows with inner fire.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 60, Stackable: true,
 		},
 		{
 			ID: "aqua_crystal", Name: "Aqua Crystal",
 			Description: "A crystal filled with water magic.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 60, Stackable: true,
 		},
 		{
 			ID: "stone_core", Name: "Stone Core",
 			Description: "Heart of a stone golem.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 70, Stackable: true,
 		},
 		{
 			ID: "gale_feather", Name: "Gale Feather",
 			Description: "A feather that floats on the wind.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 55, Stackable: true,
 		},
 		{
 			ID: "orc_tusk", Name: "Orc Tusk",
 			Description: "Massive tusk from an orc warrior.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 65, Stackable: true,
 		},
 
@@ -253,43 +231,43 @@ func (r *ItemRegistry) loadItems() {
 		{
 			ID: "dragon_scale", Name: "Dragon Scale",
 			Description: "Impenetrable scale of an ancient dragon.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 300, Stackable: true,
 		},
 		{
 			ID: "dragon_fang", Name: "Dragon Fang",
 			Description: "Massive fang capable of piercing anything.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 250, Stackable: true,
 		},
 		{
 			ID: "kraken_tentacle", Name: "Kraken Tentacle",
 			Description: "Severed tentacle from the deep sea horror.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 280, Stackable: true,
 		},
 		{
 			ID: "deep_sea_pearl", Name: "Deep Sea Pearl",
 			Description: "A pearl of incredible beauty and power.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 350, Stackable: true,
 		},
 		{
 			ID: "titan_heart", Name: "Titan Heart",
 			Description: "The core of an earth titan. Immense energy.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 400, Stackable: true,
 		},
 		{
 			ID: "adamant_ore", Name: "Adamant Ore",
 			Description: "The hardest ore known to exist.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 200, Stackable: true,
 		},
 		{
 			ID: "legendary_ore", Name: "Legendary Ore",
 			Description: "Mysterious ore radiating with power.",
-			Category:    CategoryMaterial,
+			Category:    domain.ItemMaterial,
 			BuyPrice:    0, SellPrice: 500, Stackable: true,
 		},
 	}
@@ -338,7 +316,7 @@ func (r *ItemRegistry) GetAll() []*ItemTemplate {
 func (r *ItemRegistry) GetConsumables() []*ItemTemplate {
 	var result []*ItemTemplate
 	for _, i := range r.items {
-		if i.Category == CategoryConsumable {
+		if i.Category == domain.ItemConsumable {
 			result = append(result, i)
 		}
 	}
@@ -349,7 +327,7 @@ func (r *ItemRegistry) GetConsumables() []*ItemTemplate {
 func (r *ItemRegistry) GetMaterials() []*ItemTemplate {
 	var result []*ItemTemplate
 	for _, i := range r.items {
-		if i.Category == CategoryMaterial {
+		if i.Category == domain.ItemMaterial {
 			result = append(result, i)
 		}
 	}

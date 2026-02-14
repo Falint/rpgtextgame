@@ -35,6 +35,13 @@ const (
 	BuffDefense
 )
 
+// Combat balance constants.
+const (
+	DefenseReductionRatio = 0.5 // Defense reduces incoming damage by this fraction of DEF
+	DefaultBaseAttack     = 10  // Starting base attack for new players
+	MinDamage             = 1   // Minimum damage dealt per hit
+)
+
 // PlayerConfig holds configurable player parameters.
 type PlayerConfig struct {
 	StartingHP   int
@@ -59,10 +66,10 @@ func NewPlayer(name string, cfg PlayerConfig) *Player {
 		Name:       name,
 		MaxHP:      cfg.StartingHP,
 		CurrentHP:  cfg.StartingHP,
-		BaseAttack: 10,
+		BaseAttack: DefaultBaseAttack,
 		BaseDef:    cfg.BaseDef,
 		Gold:       cfg.StartingGold,
-		Inventory:  NewInventory(20), // 20 slots like C version
+		Inventory:  NewInventory(MaxInventorySlots),
 		Buffs:      make([]Buff, 0, cfg.MaxBuffs),
 	}
 }
@@ -103,9 +110,9 @@ func (p *Player) GetDefense() int {
 // TakeDamage applies damage considering defense.
 // Returns true if player died.
 func (p *Player) TakeDamage(amount int) bool {
-	reduced := amount - int(float64(p.GetDefense())*0.5)
-	if reduced < 1 {
-		reduced = 1
+	reduced := amount - int(float64(p.GetDefense())*DefenseReductionRatio)
+	if reduced < MinDamage {
+		reduced = MinDamage
 	}
 	p.CurrentHP -= reduced
 	if p.CurrentHP < 0 {

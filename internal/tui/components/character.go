@@ -9,6 +9,14 @@ import (
 	"github.com/tenyom/textrpg-tui/internal/tui/styles"
 )
 
+// HP display thresholds and bar sizing.
+const (
+	HPLowThreshold = 0.3 // Show HP as red below 30%
+	HPBarMinWidth  = 10  // Minimum HP bar character width
+	HPBarMaxWidth  = 30  // Maximum HP bar character width
+	HPBarPadding   = 8   // Padding subtracted from panel width
+)
+
 // -----------------------------------------------------------------------------
 // Character Component (Block 2)
 // -----------------------------------------------------------------------------
@@ -113,7 +121,7 @@ func (c Character) renderHPValue() string {
 
 	hpStr := fmt.Sprintf("%d/%d", hp, maxHP)
 
-	if pct <= 0.3 {
+	if pct <= HPLowThreshold {
 		return styles.HPLowStyle.Render(hpStr)
 	}
 	return styles.HPFullStyle.Render(hpStr)
@@ -125,12 +133,12 @@ func (c Character) renderHPBar() string {
 	maxHP := c.player.MaxHP
 	pct := float64(hp) / float64(maxHP)
 
-	barWidth := c.width - 8
-	if barWidth < 10 {
-		barWidth = 10
+	barWidth := c.width - HPBarPadding
+	if barWidth < HPBarMinWidth {
+		barWidth = HPBarMinWidth
 	}
-	if barWidth > 30 {
-		barWidth = 30
+	if barWidth > HPBarMaxWidth {
+		barWidth = HPBarMaxWidth
 	}
 
 	filled := int(pct * float64(barWidth))
@@ -140,7 +148,7 @@ func (c Character) renderHPBar() string {
 
 	bar := strings.Repeat("█", filled) + strings.Repeat("░", barWidth-filled)
 
-	if pct <= 0.3 {
+	if pct <= HPLowThreshold {
 		return styles.HPLowStyle.Render("[" + bar + "]")
 	}
 	return styles.HPFullStyle.Render("[" + bar + "]")

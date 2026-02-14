@@ -1,4 +1,12 @@
-// TextRPG TUI - Production Build (Go/BubbleTea)
+// TextRPG — Production Build (Go/BubbleTea)
+//
+// Entry point at project root so the binary can be built with:
+//
+//	go build -o textrpg
+//
+// And executed directly:
+//
+//	./textrpg
 package main
 
 import (
@@ -45,7 +53,7 @@ func main() {
 	// 5. Run Application
 	p := tea.NewProgram(model, tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
-		fmt.Printf("Error running game: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error running game: %v\n", err)
 		os.Exit(1)
 	}
 }

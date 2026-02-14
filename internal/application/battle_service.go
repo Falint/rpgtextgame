@@ -24,6 +24,13 @@ const (
 // battleLogCapacity is the maximum number of log entries retained in memory.
 const battleLogCapacity = 20
 
+// Combat balance constants.
+const (
+	CriticalHitChance     = 0.10 // 10% chance for a critical hit
+	CriticalHitMultiplier = 1.5  // Critical hits deal 150% damage
+	EscapeChance          = 0.5  // 50% chance to flee from non-boss battles
+)
+
 // BattleService handles combat logic.
 // It manages turn order, damage calculations, and victory/defeat conditions.
 // Item effect application is delegated to the centralized ItemService.
@@ -100,15 +107,15 @@ func (b *BattleService) Attack() {
 		modifier = b.player.EquippedWeapon.Element.DamageModifier(b.enemy.Element)
 	}
 
-	// Critical hit (10% chance, 1.5x damage)
-	crit := rand.Float64() < 0.1
+	// Critical hit
+	crit := rand.Float64() < CriticalHitChance
 	if crit {
-		atk = int(float64(atk) * 1.5)
+		atk = int(float64(atk) * CriticalHitMultiplier)
 	}
 
 	damage := int(float64(atk) * modifier)
-	if damage < 1 {
-		damage = 1
+	if damage < domain.MinDamage {
+		damage = domain.MinDamage
 	}
 
 	// Apply damage
@@ -187,7 +194,7 @@ func (b *BattleService) TryEscape() bool {
 	}
 
 	// 50% escape chance
-	if rand.Float64() < 0.5 {
+	if rand.Float64() < EscapeChance {
 		b.addLog("Got away safely!")
 		b.state = BattleEscaped
 		return true
@@ -210,8 +217,8 @@ func (b *BattleService) enemyTurn() {
 	modifier := b.enemy.Element.DamageModifier(domain.ElementNone)
 
 	damage := int(float64(atk) * modifier)
-	if damage < 1 {
-		damage = 1
+	if damage < domain.MinDamage {
+		damage = domain.MinDamage
 	}
 
 	// Apply to player

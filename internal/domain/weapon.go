@@ -1,5 +1,7 @@
 package domain
 
+import "fmt"
+
 // Weapon represents an equippable weapon.
 type Weapon struct {
 	ID          string
@@ -24,6 +26,9 @@ const (
 	WeaponDagger
 )
 
+// TierBonusPerLevel is the fractional damage increase per tier above 1.
+const TierBonusPerLevel = 0.15
+
 // String returns the weapon type name.
 func (t WeaponType) String() string {
 	switch t {
@@ -44,7 +49,7 @@ func (t WeaponType) String() string {
 
 // Damage returns the total damage including tier bonus.
 func (w *Weapon) Damage() int {
-	tierMult := 1.0 + (float64(w.Tier-1) * 0.15)
+	tierMult := 1.0 + (float64(w.Tier-1) * TierBonusPerLevel)
 	return int(float64(w.BaseDamage) * tierMult)
 }
 
@@ -56,7 +61,7 @@ func (w *Weapon) CanUpgrade() bool {
 // DisplayName returns name with tier indicator.
 func (w *Weapon) DisplayName() string {
 	if w.Tier > 1 {
-		return w.Name + " +" + string(rune('0'+w.Tier-1))
+		return fmt.Sprintf("%s +%d", w.Name, w.Tier-1)
 	}
 	return w.Name
 }
