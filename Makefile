@@ -1,83 +1,37 @@
-# TextRPG Makefile
-# Professional build system with automatic dependency tracking
+CXX      := g++
+CXXFLAGS := -std=c++17 -Wall -Wextra -O2 -Isrc
+TARGET   := textrpg.exe
 
-# ============================================
-# CONFIGURATION
-# ============================================
-TARGET     = textrpg
-BUILD_DIR  = build
-SRC_DIR    = src
+SRCS := \
+  src/main.cpp \
+  src/domain/inventory.cpp \
+  src/domain/enemy.cpp \
+  src/domain/player.cpp \
+  src/data/monsters.cpp \
+  src/data/weapons.cpp \
+  src/data/items.cpp \
+  src/data/upgrades.cpp \
+  src/game/item_service.cpp \
+  src/game/battle_service.cpp \
+  src/game/shop_service.cpp \
+  src/tui/terminal.cpp \
+  src/tui/renderer.cpp \
+  src/tui/screens.cpp \
+  src/tui/screens2.cpp \
+  src/tui/screens3.cpp \
+  src/tui/app.cpp
 
-CC         = gcc
-CFLAGS     = -Wall -Wextra -Werror -std=c99 -I$(SRC_DIR) -MMD -MP
+OBJS := $(SRCS:.cpp=.o)
 
-# Debug build (uncomment for debugging)
-# CFLAGS += -g -O0 -DDEBUG
+all: $(TARGET)
 
-# Release build (uncomment for release)
-# CFLAGS += -O2 -DNDEBUG
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# ============================================
-# SOURCE FILES
-# ============================================
-# Find all .c files recursively
-SRCS := $(shell find $(SRC_DIR) -name '*.c')
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-# Convert source paths to object paths in build directory
-OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
-
-# Dependency files for incremental builds
-DEPS := $(OBJS:.o=.d)
-
-# ============================================
-# TARGETS
-# ============================================
-
-# Default target: build the game
-all: $(BUILD_DIR)/$(TARGET)
-
-# Link all object files into the executable
-$(BUILD_DIR)/$(TARGET): $(OBJS)
-	@echo "Linking $(TARGET)..."
-	@$(CC) $(OBJS) -o $@
-	@echo "Build complete: $@"
-
-# Compile each .c file to .o, maintaining directory structure
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(dir $@)
-	@echo "Compiling $<..."
-	@$(CC) $(CFLAGS) -c $< -o $@
-
-# Include generated dependency files
--include $(DEPS)
-
-# ============================================
-# PHONY TARGETS
-# ============================================
-.PHONY: all clean run rebuild info
-
-# Remove all build artifacts
 clean:
-	@echo "Cleaning build directory..."
-	@rm -rf $(BUILD_DIR)
-	@echo "Clean complete."
+	del /Q $(subst /,\,$(OBJS)) $(TARGET) 2>nul || true
 
-# Build and run
-run: $(BUILD_DIR)/$(TARGET)
-	@./$(BUILD_DIR)/$(TARGET)
-
-# Full rebuild
-rebuild: clean all
-
-# Show build information
-info:
-	@echo "=== Build Info ==="
-	@echo "Target:     $(TARGET)"
-	@echo "Compiler:   $(CC)"
-	@echo "Flags:      $(CFLAGS)"
-	@echo ""
-	@echo "Source files:"
-	@echo "$(SRCS)" | tr ' ' '\n' | sed 's/^/  /'
-	@echo ""
-	@echo "Object files:"
-	@echo "$(OBJS)" | tr ' ' '\n' | sed 's/^/  /'
+.PHONY: all clean
