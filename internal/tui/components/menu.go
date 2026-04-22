@@ -1,27 +1,32 @@
+// Package components provides reusable TUI components for the 3-panel layout.
+// Components are the visual building blocks of the UI, handling their own
+// navigation, rendering, and focus state.
 package components
 
 import (
-	"fmt"
-	"strings"
+	"fmt"     // Sprintf for menu item numbering
+	"strings" // Builder for efficient string concatenation
 
-	"github.com/charmbracelet/bubbles/key"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/tenyom/textrpg-tui/internal/tui/styles"
+	"github.com/charmbracelet/bubbles/key"              // Key binding definitions
+	tea "github.com/charmbracelet/bubbletea"            // BubbleTea message types
+	"github.com/tenyom/textrpg-tui/internal/tui/styles" // Centralized style definitions
 )
 
 // -----------------------------------------------------------------------------
 // Key Bindings
 // -----------------------------------------------------------------------------
 
+// Pre-allocated key bindings for menu navigation.
+// Using key.NewBinding() avoids creating new binding objects on each input event.
 var (
 	keyUp = key.NewBinding(
-		key.WithKeys("up", "k"),
+		key.WithKeys("up", "k"), // Arrow up or vim-style 'k' for upward navigation
 	)
 	keyDown = key.NewBinding(
-		key.WithKeys("down", "j"),
+		key.WithKeys("down", "j"), // Arrow down or vim-style 'j' for downward navigation
 	)
 	keyEnter = key.NewBinding(
-		key.WithKeys("enter"),
+		key.WithKeys("enter"), // Enter key for menu selection confirmation
 	)
 )
 

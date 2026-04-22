@@ -1,62 +1,68 @@
-// Package registry provides data registries for game entities.
+// Package registry provides read-only data registries for game entities.
 // Mirrors the C data layer with all monsters, weapons, and items.
 package registry
 
 import (
-	"math/rand"
+	"math/rand" // Required for GetRandom() uniform monster selection
 
-	"github.com/tenyom/textrpg-tui/internal/domain"
+	"github.com/tenyom/textrpg-tui/internal/domain" // Domain types for MonsterType, Element, Enemy
 )
 
-// MonsterTemplate is a read-only monster definition.
+// MonsterTemplate is an immutable monster definition loaded at startup.
+// Used by BattleService to create mutable Enemy instances via ToEnemy().
 type MonsterTemplate struct {
-	ID        string
-	Name      string
-	Type      domain.MonsterType
-	Element   domain.Element
-	BaseHP    int
-	BaseAtk   int
-	BaseDef   int
-	GoldMin   int
-	GoldMax   int
-	LootTable []LootEntry
+	ID        string             // Unique key (e.g., "slime", "dragon")
+	Name      string             // Display name shown in battle UI
+	Type      domain.MonsterType // Difficulty tier: Normal, Elite, or Boss
+	Element   domain.Element     // Elemental affinity for damage calculations
+	BaseHP    int                // Starting hit points for this monster
+	BaseAtk   int                // Base attack power
+	BaseDef   int                // Base defense value
+	GoldMin   int                // Minimum gold reward on defeat
+	GoldMax   int                // Maximum gold reward on defeat
+	LootTable []LootEntry        // Possible item drops (NOTE: not yet processed in battle)
 }
 
-// LootEntry defines a possible item drop.
+// LootEntry defines a single possible item drop from a monster.
+// Used in loot table definitions — not yet processed by BattleService.
 type LootEntry struct {
-	ItemID     string
-	DropChance float64
+	ItemID     string  // Item registry ID of the droppable item
+	DropChance float64 // Probability of dropping (0.0 to 1.0, e.g., 0.5 = 50%)
 }
 
-// ToEnemy creates an Enemy instance from template.
+// ToEnemy creates a mutable domain.Enemy instance from this immutable template.
+// The enemy starts at full HP (CurrentHP = BaseHP) and copies all stats.
+// Called by BattleService.StartBattle() for each new combat encounter.
 func (t *MonsterTemplate) ToEnemy() *domain.Enemy {
 	return &domain.Enemy{
-		ID:        t.ID,
-		Name:      t.Name,
-		Type:      t.Type,
-		Element:   t.Element,
-		MaxHP:     t.BaseHP,
-		CurrentHP: t.BaseHP,
-		Attack:    t.BaseAtk,
-		Defense:   t.BaseDef,
-		GoldMin:   t.GoldMin,
-		GoldMax:   t.GoldMax,
+		ID:        t.ID,      // Copy identifier
+		Name:      t.Name,    // Copy display name
+		Type:      t.Type,    // Copy difficulty tier
+		Element:   t.Element, // Copy element for damage modifiers
+		MaxHP:     t.BaseHP,  // Set max HP from template
+		CurrentHP: t.BaseHP,  // Start at full health
+		Attack:    t.BaseAtk, // Copy attack power
+		Defense:   t.BaseDef, // Copy defense value
+		GoldMin:   t.GoldMin, // Copy min gold reward
+		GoldMax:   t.GoldMax, // Copy max gold reward
 	}
 }
 
-// MonsterRegistry holds all monster templates.
+// MonsterRegistry is the read-only data store for all monster definitions.
+// Supports lookup by ID, by type, and random selection for encounters.
 type MonsterRegistry struct {
-	monsters map[string]*MonsterTemplate
-	byType   map[domain.MonsterType][]*MonsterTemplate
+	monsters map[string]*MonsterTemplate               // All monsters indexed by ID
+	byType   map[domain.MonsterType][]*MonsterTemplate // Monsters grouped by difficulty tier
 }
 
-// NewMonsterRegistry creates registry with all monsters from C data.
+// NewMonsterRegistry creates and initializes the monster registry.
+// Populates both the by-ID and by-type indexes for efficient querying.
 func NewMonsterRegistry() *MonsterRegistry {
 	r := &MonsterRegistry{
-		monsters: make(map[string]*MonsterTemplate),
-		byType:   make(map[domain.MonsterType][]*MonsterTemplate),
+		monsters: make(map[string]*MonsterTemplate),               // Initialize ID lookup
+		byType:   make(map[domain.MonsterType][]*MonsterTemplate), // Initialize type grouping
 	}
-	r.loadMonsters()
+	r.loadMonsters() // Load all 10 monster definitions from hardcoded data
 	return r
 }
 
@@ -142,36 +148,42 @@ func (r *MonsterRegistry) loadMonsters() {
 		},
 	}
 
+	// Build both indexes: by-ID and by-type for efficient lookup
 	for _, m := range monsters {
-		r.monsters[m.ID] = m
-		r.byType[m.Type] = append(r.byType[m.Type], m)
+		r.monsters[m.ID] = m                           // Index by unique ID
+		r.byType[m.Type] = append(r.byType[m.Type], m) // Group by difficulty tier
 	}
 }
 
-// GetByID returns monster by ID.
+// GetByID returns a monster template by its unique identifier.
+// Returns nil if the ID doesn't match any monster.
 func (r *MonsterRegistry) GetByID(id string) *MonsterTemplate {
-	return r.monsters[id]
+	return r.monsters[id] // O(1) map lookup
 }
 
-// GetByType returns all monsters of given type.
+// GetByType returns all monsters of the specified difficulty tier.
+// Used for displaying available monsters or advanced encounter logic.
 func (r *MonsterRegistry) GetByType(t domain.MonsterType) []*MonsterTemplate {
-	return r.byType[t]
+	return r.byType[t] // Returns slice of all monsters in tier
 }
 
-// GetRandom returns a random monster of given type.
+// GetRandom returns a uniformly random monster of the specified type.
+// Used by BattleService.StartBattle() to select a random encounter.
+// Returns nil if no monsters exist for the given type.
 func (r *MonsterRegistry) GetRandom(t domain.MonsterType) *MonsterTemplate {
-	list := r.byType[t]
+	list := r.byType[t] // Get all monsters of this type
 	if len(list) == 0 {
-		return nil
+		return nil // No monsters of this type registered
 	}
-	return list[rand.Intn(len(list))]
+	return list[rand.Intn(len(list))] // Uniform random selection
 }
 
-// GetAll returns all monsters.
+// GetAll returns all registered monsters regardless of type.
+// Used for debug/admin display purposes.
 func (r *MonsterRegistry) GetAll() []*MonsterTemplate {
-	result := make([]*MonsterTemplate, 0, len(r.monsters))
+	result := make([]*MonsterTemplate, 0, len(r.monsters)) // Pre-allocate with known size
 	for _, m := range r.monsters {
-		result = append(result, m)
+		result = append(result, m) // Collect all templates
 	}
 	return result
 }

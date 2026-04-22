@@ -1,4 +1,6 @@
-// Package screens provides game screen implementations for Block 3.
+// status.go implements the player status overview screen.
+// Displays detailed player stats: HP, ATK, DEF, gold, equipped weapon,
+// active buffs, and comprehensive stat breakdowns.
 package screens
 
 import (

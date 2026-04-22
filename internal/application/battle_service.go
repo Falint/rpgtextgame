@@ -1,270 +1,286 @@
-// Package application provides game services and orchestration.
+// Package application provides use-case services that orchestrate domain logic.
+//
+// DESIGN: Services in this package coordinate multi-entity operations by composing
+// domain methods with infrastructure registry lookups. They contain no UI logic
+// and no direct data access — all data comes through injected dependencies.
 package application
 
 import (
-	"fmt"
-	"math/rand"
+	"fmt"       // Sprintf for formatting battle log messages
+	"math/rand" // Random number generation for critical hits and escape rolls
 
-	"github.com/tenyom/textrpg-tui/internal/domain"
-	"github.com/tenyom/textrpg-tui/internal/infrastructure/registry"
+	"github.com/tenyom/textrpg-tui/internal/domain"                  // Domain entities and types
+	"github.com/tenyom/textrpg-tui/internal/infrastructure/registry" // Monster data source
 )
-
-// BattleState represents current battle status.
-type BattleState int
-
-const (
-	BattleNone BattleState = iota
-	BattlePlayerTurn
-	BattleEnemyTurn
-	BattleWon
-	BattleLost
-	BattleEscaped
-)
-
-// battleLogCapacity is the maximum number of log entries retained in memory.
-const battleLogCapacity = 20
 
 // Combat balance constants.
+// Named constants prevent magic numbers and make tuning visible.
 const (
-	CriticalHitChance     = 0.10 // 10% chance for a critical hit
-	CriticalHitMultiplier = 1.5  // Critical hits deal 150% damage
-	EscapeChance          = 0.5  // 50% chance to flee from non-boss battles
+	CriticalHitChance     = 0.10 // 10% chance of dealing critical damage each attack
+	CriticalHitMultiplier = 1.5  // Critical hits deal 150% of calculated damage
+	EscapeChance          = 0.5  // 50% base chance to escape from non-boss enemies
+	battleLogCapacity     = 20   // Maximum number of log entries before oldest is dropped
 )
 
-// BattleService handles combat logic.
-// It manages turn order, damage calculations, and victory/defeat conditions.
-// Item effect application is delegated to the centralized ItemService.
+// BattleState tracks the current phase of combat.
+// State machine transitions: None → PlayerTurn → EnemyTurn → PlayerTurn ... → Won/Lost/Escaped
+type BattleState int
+
+// Battle state constants.
+const (
+	BattleNone       BattleState = iota // No battle active — default/idle state
+	BattlePlayerTurn                    // Awaiting player action (Attack/Item/Run)
+	BattleEnemyTurn                     // Enemy is attacking (auto-resolved)
+	BattleWon                           // Player defeated the enemy
+	BattleLost                          // Enemy defeated the player
+	BattleEscaped                       // Player successfully escaped
+)
+
+// BattleService orchestrates turn-based combat.
+// Manages the state machine, damage calculations, and reward distribution.
+// Delegates item effects to ItemService for centralized processing.
 type BattleService struct {
-	player      *domain.Player
-	enemy       *domain.Enemy
-	monsters    *registry.MonsterRegistry
-	items       *registry.ItemRegistry
-	itemService *ItemService // Centralized item effect processor
-	state       BattleState
-	log         []string
+	player          *domain.Player            // Mutable player reference
+	monsterRegistry *registry.MonsterRegistry // Read-only monster data source
+	itemService     *ItemService              // Shared consumable effect processor
+
+	// Battle state
+	currentEnemy *domain.Enemy // Active enemy for current battle
+	state        BattleState   // Current state machine position
+	logs         []string      // Combat log messages for UI display
+	turnCount    int           // Number of complete rounds elapsed
+	goldEarned   int           // Gold rewarded on victory (0 if not won yet)
 }
 
-// NewBattleService creates a battle service.
-// itemService is the shared, centralized item effect processor.
+// NewBattleService creates battle service with injected dependencies.
+// ItemService is shared with InventoryScreen to ensure consistent item effects.
 func NewBattleService(
 	player *domain.Player,
-	monsters *registry.MonsterRegistry,
-	items *registry.ItemRegistry,
+	monsterReg *registry.MonsterRegistry,
 	itemService *ItemService,
 ) *BattleService {
 	return &BattleService{
-		player:      player,
-		monsters:    monsters,
-		items:       items,
-		itemService: itemService,
-		state:       BattleNone,
-		log:         make([]string, 0, battleLogCapacity),
+		player:          player,                               // Store player reference for combat mutations
+		monsterRegistry: monsterReg,                           // Store registry for enemy lookup
+		itemService:     itemService,                          // Store shared item processing service
+		state:           BattleNone,                           // Start with no active battle
+		logs:            make([]string, 0, battleLogCapacity), // Pre-allocate log buffer
 	}
 }
 
-// StartBattle begins a new battle with random enemy of given type.
-func (b *BattleService) StartBattle(monsterType domain.MonsterType) bool {
-	template := b.monsters.GetRandom(monsterType)
-	if template == nil {
-		return false
+// StartBattle initializes combat against a random monster of the given type.
+// Resets all battle state and transitions to PlayerTurn.
+func (bs *BattleService) StartBattle(monsterType domain.MonsterType) {
+	// Get a random monster template from the registry and create a mutable enemy
+	template := bs.monsterRegistry.GetRandom(monsterType)
+	bs.currentEnemy = template.ToEnemy() // Convert template → mutable enemy instance
+
+	// Reset all battle state for the new encounter
+	bs.state = BattlePlayerTurn // Player acts first
+	bs.logs = bs.logs[:0]       // Clear log buffer (reuse underlying array)
+	bs.turnCount = 0            // Reset turn counter
+	bs.goldEarned = 0           // Reset reward tracker
+
+	// Add initial battle log entry
+	bs.addLog(fmt.Sprintf("A wild %s appears!", bs.currentEnemy.Name))
+
+	// Show elemental type for non-None elements
+	if bs.currentEnemy.Element != domain.ElementNone {
+		bs.addLog(fmt.Sprintf("Element: %s", bs.currentEnemy.Element))
 	}
-
-	b.enemy = template.ToEnemy()
-	b.state = BattlePlayerTurn
-	b.log = b.log[:0]
-	b.addLog(fmt.Sprintf("A wild %s appears!", b.enemy.Name))
-
-	return true
 }
 
-// GetEnemy returns current enemy.
-func (b *BattleService) GetEnemy() *domain.Enemy {
-	return b.enemy
-}
-
-// GetState returns current battle state.
-func (b *BattleService) GetState() BattleState {
-	return b.state
-}
-
-// GetLog returns battle log.
-func (b *BattleService) GetLog() []string {
-	return b.log
-}
-
-// Attack performs player attack on enemy.
-func (b *BattleService) Attack() {
-	if b.state != BattlePlayerTurn || b.enemy == nil {
+// Attack executes player's attack action.
+// Calculates damage with weapon bonus, elemental modifier, and critical hit roll.
+// After player attack, triggers enemy turn if enemy survives.
+func (bs *BattleService) Attack() {
+	// Guard: only process attacks during player turn
+	if bs.state != BattlePlayerTurn {
 		return
 	}
 
-	// Calculate damage
-	atk := b.player.GetAttack()
+	// Step 1: Calculate base damage from player's total attack (base + weapon + buffs)
+	baseDamage := bs.player.GetAttack()
 
-	// Element modifier
-	var modifier float64 = 1.0
-	if b.player.EquippedWeapon != nil {
-		modifier = b.player.EquippedWeapon.Element.DamageModifier(b.enemy.Element)
+	// Step 2: Apply elemental damage modifier (1.0x, 2.0x, or 0.5x)
+	var elementMod float64 = 1.0 // Default neutral modifier
+	if bs.player.EquippedWeapon != nil {
+		// Get weapon's element matchup against enemy's element
+		elementMod = bs.player.EquippedWeapon.Element.DamageModifier(bs.currentEnemy.GetElement())
+	}
+	damage := int(float64(baseDamage) * elementMod) // Apply element multiplier
+
+	// Step 3: Roll for critical hit (10% chance for 1.5x damage)
+	isCrit := rand.Float64() < CriticalHitChance
+	if isCrit {
+		damage = int(float64(damage) * CriticalHitMultiplier) // Apply crit multiplier
 	}
 
-	// Critical hit
-	crit := rand.Float64() < CriticalHitChance
-	if crit {
-		atk = int(float64(atk) * CriticalHitMultiplier)
+	// Step 4: Apply damage to enemy (enemy.TakeDamage handles defense reduction)
+	killed := bs.currentEnemy.TakeDamage(damage)
+
+	// Step 5: Build log message with damage details
+	logMsg := fmt.Sprintf("You attack %s for %d damage!", bs.currentEnemy.Name, damage)
+	if isCrit {
+		logMsg = "CRITICAL HIT! " + logMsg // Prepend crit indicator
 	}
-
-	damage := int(float64(atk) * modifier)
-	if damage < domain.MinDamage {
-		damage = domain.MinDamage
+	// Add elemental effectiveness messages
+	if elementMod > 1.0 {
+		logMsg += " (Super effective!)" // 2.0x element advantage
+	} else if elementMod < 1.0 {
+		logMsg += " (Not very effective...)" // 0.5x element disadvantage
 	}
+	bs.addLog(logMsg) // Write to battle log
 
-	// Apply damage
-	killed := b.enemy.TakeDamage(damage)
-
-	// Log
-	if crit {
-		b.addLog(fmt.Sprintf("CRITICAL HIT! You deal %d damage!", damage))
-	} else {
-		b.addLog(fmt.Sprintf("You deal %d damage!", damage))
-	}
-
-	if modifier > 1.0 {
-		b.addLog("It's super effective!")
-	} else if modifier < 1.0 {
-		b.addLog("It's not very effective...")
-	}
-
+	// Step 6: Handle battle outcome
 	if killed {
-		b.onEnemyDefeated()
+		bs.onEnemyDefeated() // Process victory rewards
 	} else {
-		b.state = BattleEnemyTurn
-		b.enemyTurn()
+		bs.enemyTurn() // Enemy attacks back
 	}
 }
 
-// UseItem uses a consumable from inventory.
-func (b *BattleService) UseItem(slotIndex int) bool {
-	// Guard: only allow item usage during player's turn
-	if b.state != BattlePlayerTurn {
-		return false
+// UseItem attempts to use a consumable from inventory during battle.
+// Delegates effect processing to ItemService for consistent behavior.
+// On success, removes the item and advances to enemy turn.
+func (bs *BattleService) UseItem(slotIndex int) {
+	// Guard: ensure we're in player turn state
+	if bs.state != BattlePlayerTurn {
+		return
 	}
 
-	// Validate slot contains a consumable item
-	slot := b.player.Inventory.GetSlot(slotIndex)
+	// Step 1: Validate the inventory slot
+	slot := bs.player.Inventory.GetSlot(slotIndex)
 	if slot == nil || slot.Type != domain.SlotItem {
-		return false
-	}
-	if slot.Item.Category != domain.ItemConsumable {
-		return false
+		bs.addLog("Invalid item slot!") // Slot doesn't exist or isn't an item
+		return
 	}
 
-	// Delegate effect application to the centralized ItemService.
-	// This ensures consistent behavior between battle and inventory usage.
-	result := b.itemService.UseConsumable(slot.Item)
+	// Step 2: Delegate effect processing to ItemService (centralized logic)
+	// This ensures identical validation and effects whether used in battle or inventory.
+	result := bs.itemService.UseConsumable(bs.player, slot.Item)
 
-	if !result.Success {
-		// Item effect was rejected (e.g., HP already full).
-		// Log the reason but do NOT consume the item or end the turn.
-		b.addLog(result.Error)
-		return false
+	// Step 3: Handle result
+	if result.Success {
+		bs.addLog(result.Message) // Log the effect message (e.g., "Healed 30 HP!")
+		// Remove one unit from inventory — only after confirming effect succeeded
+		bs.player.Inventory.RemoveItem(slotIndex, 1)
+		// Advance to enemy turn — using an item consumes the player's action
+		bs.enemyTurn()
+	} else {
+		// Item use failed (e.g., HP already full) — no turn consumed
+		bs.addLog(result.Error)
 	}
-
-	// Effect applied successfully — log the result message
-	b.addLog(result.Message)
-
-	// Remove the consumed item from the inventory slot
-	b.player.Inventory.RemoveItem(slotIndex, 1)
-
-	// End player's turn and trigger enemy response
-	b.state = BattleEnemyTurn
-	b.enemyTurn()
-	return true
 }
 
 // TryEscape attempts to flee from battle.
-func (b *BattleService) TryEscape() bool {
-	if b.state != BattlePlayerTurn || b.enemy == nil {
-		return false
-	}
-
-	// Boss cannot be escaped
-	if b.enemy.Type == domain.MonsterBoss {
-		b.addLog("Cannot escape from a BOSS!")
-		return false
-	}
-
-	// 50% escape chance
-	if rand.Float64() < EscapeChance {
-		b.addLog("Got away safely!")
-		b.state = BattleEscaped
-		return true
-	}
-
-	b.addLog("Couldn't escape!")
-	b.state = BattleEnemyTurn
-	b.enemyTurn()
-	return false
-}
-
-// enemyTurn performs enemy attack.
-func (b *BattleService) enemyTurn() {
-	if b.enemy == nil || !b.enemy.IsAlive() {
+// Bosses cannot be escaped. Non-boss enemies have 50% escape chance.
+func (bs *BattleService) TryEscape() {
+	// Guard: only allow escape during player turn
+	if bs.state != BattlePlayerTurn {
 		return
 	}
 
-	// Calculate damage
-	atk := b.enemy.Attack
-	modifier := b.enemy.Element.DamageModifier(domain.ElementNone)
-
-	damage := int(float64(atk) * modifier)
-	if damage < domain.MinDamage {
-		damage = domain.MinDamage
+	// Boss encounters cannot be fled — design decision from C version
+	if bs.currentEnemy.Type == domain.MonsterBoss {
+		bs.addLog("Cannot escape from a Boss battle!") // Display reason in log
+		return                                         // No turn consumed
 	}
 
-	// Apply to player
-	killed := b.player.TakeDamage(damage)
-
-	b.addLog(fmt.Sprintf("%s deals %d damage to you!", b.enemy.Name, damage))
-
-	if killed {
-		b.addLog("You have been defeated...")
-		b.state = BattleLost
+	// Roll for escape success (50% chance)
+	if rand.Float64() < EscapeChance {
+		bs.state = BattleEscaped // Transition to escaped state
+		bs.addLog("You escaped successfully!")
 	} else {
-		// Tick buffs at end of full turn
-		b.player.TickBuffs()
-		b.state = BattlePlayerTurn
+		bs.addLog("Failed to escape!") // Display failure message
+		bs.enemyTurn()                 // Failed escape consumes turn — enemy attacks
 	}
 }
 
-// onEnemyDefeated handles victory rewards.
-func (b *BattleService) onEnemyDefeated() {
-	b.addLog(fmt.Sprintf("Defeated %s!", b.enemy.Name))
+// enemyTurn executes enemy attack after player action.
+// Increments turn counter and ticks buff durations.
+func (bs *BattleService) enemyTurn() {
+	bs.state = BattleEnemyTurn // Update state to enemy turn
 
-	// Gold reward
-	gold := b.enemy.RollGold()
-	b.player.AddGold(gold)
-	b.addLog(fmt.Sprintf("Obtained %d gold!", gold))
+	// Calculate enemy damage (no weapon/buff system for enemies — raw attack only)
+	damage := bs.currentEnemy.GetAttack()
 
-	// Loot drops would go here
-	// (simplified - full loot table processing would use registry)
+	// Apply damage to player (player.TakeDamage handles defense reduction)
+	playerDied := bs.player.TakeDamage(damage)
+	bs.addLog(fmt.Sprintf("%s attacks you for %d damage!", bs.currentEnemy.Name, damage))
 
-	b.state = BattleWon
-}
-
-// EndBattle cleans up battle state.
-func (b *BattleService) EndBattle() {
-	b.enemy = nil
-	b.state = BattleNone
-}
-
-// IsBattleOver returns true if battle ended.
-func (b *BattleService) IsBattleOver() bool {
-	return b.state == BattleWon || b.state == BattleLost || b.state == BattleEscaped
-}
-
-func (b *BattleService) addLog(msg string) {
-	b.log = append(b.log, msg)
-	if len(b.log) > battleLogCapacity {
-		b.log = b.log[1:]
+	// Check for player death
+	if playerDied {
+		bs.state = BattleLost // Transition to defeat state
+		bs.addLog("You have been defeated...")
+		return
 	}
+
+	// Complete the full round — tick buffs and advance turn counter
+	bs.turnCount++        // Increment round counter
+	bs.player.TickBuffs() // Decrement buff durations, remove expired buffs
+
+	// Return control to player for next action
+	bs.state = BattlePlayerTurn
+}
+
+// onEnemyDefeated handles victory processing.
+// Rolls gold reward and adds it to player's balance.
+func (bs *BattleService) onEnemyDefeated() {
+	bs.state = BattleWon // Transition to victory state
+
+	// Roll random gold within enemy's [GoldMin, GoldMax] range
+	gold := bs.currentEnemy.RollGold()
+	bs.goldEarned = gold // Store for UI display
+
+	// Add gold to player balance
+	bs.player.AddGold(gold)
+
+	// Log victory and reward
+	bs.addLog(fmt.Sprintf("%s has been defeated!", bs.currentEnemy.Name))
+	bs.addLog(fmt.Sprintf("You earned %d gold!", gold))
+
+	// TODO: Implement loot drops from MonsterTemplate.LootTable
+	// This would involve: checking drop chances, creating items from templates,
+	// adding to inventory, and logging drops.
+}
+
+// addLog appends message to combat log.
+// If the log exceeds capacity, the oldest entry is dropped (FIFO behavior).
+func (bs *BattleService) addLog(msg string) {
+	bs.logs = append(bs.logs, msg) // Append new message
+	// Trim oldest messages if capacity exceeded
+	if len(bs.logs) > battleLogCapacity {
+		bs.logs = bs.logs[1:] // Remove first element (oldest message)
+	}
+}
+
+// State returns current battle state.
+// Used by BattleScreen to determine which mode/UI to display.
+func (bs *BattleService) State() BattleState {
+	return bs.state
+}
+
+// Enemy returns current enemy.
+// Used by BattleScreen to render enemy status (name, HP, element).
+func (bs *BattleService) Enemy() *domain.Enemy {
+	return bs.currentEnemy
+}
+
+// Logs returns battle log.
+// Used by BattleScreen to render combat history.
+func (bs *BattleService) Logs() []string {
+	return bs.logs
+}
+
+// TurnCount returns current turn number.
+// Displayed in battle UI as "Turn: N".
+func (bs *BattleService) TurnCount() int {
+	return bs.turnCount
+}
+
+// GoldEarned returns gold earned from last victory.
+// Displayed in victory result screen.
+func (bs *BattleService) GoldEarned() int {
+	return bs.goldEarned
 }

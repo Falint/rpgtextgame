@@ -1,54 +1,65 @@
-// Package registry provides data registries for game entities.
-// All data here EXACTLY matches C src/data/*.c files.
+// Package registry provides read-only data registries for game entities.
+// All data definitions EXACTLY match the C src/data/*.c files to ensure
+// feature parity between the C and Go versions of the game.
+//
+// DESIGN PATTERN: Repository/Registry
+// Each registry loads its data at initialization and provides typed query
+// methods for lookup, filtering, and shop stock management.
 package registry
 
-import "github.com/tenyom/textrpg-tui/internal/domain"
+import "github.com/tenyom/textrpg-tui/internal/domain" // Domain types for item categories, consumable types
 
-// ItemTemplate is a read-only item definition.
-// EXACT MATCH: C src/data/items.h ItemTemplate struct
+// ItemTemplate is an immutable item definition loaded at initialization.
+// EXACT MATCH: C src/data/items.h ItemTemplate struct.
+// Templates are never modified at runtime — mutable domain.Item instances
+// are created from templates via ToItem() for inventory placement.
 type ItemTemplate struct {
-	ID             string
-	Name           string
-	Description    string
-	Category       domain.ItemCategory
-	ConsumableType domain.ConsumableType
-	Value          int // heal amount, buff %, etc
-	Duration       int // buff duration in turns
-	BuyPrice       int // 0 = not buyable
-	SellPrice      int
-	Stackable      bool
+	ID             string                // Unique key (e.g., "small_potion", "slime_gel")
+	Name           string                // Display name for shop/inventory UI
+	Description    string                // Flavor text for item details
+	Category       domain.ItemCategory   // ItemConsumable or ItemMaterial
+	ConsumableType domain.ConsumableType // Effect dispatcher (ConsumeHeal, ConsumeBuffAtk, etc.)
+	Value          int                   // Effect magnitude: heal amount or buff percentage
+	Duration       int                   // Buff duration in combat turns (0 for non-buff items)
+	BuyPrice       int                   // Shop purchase cost in gold (0 = not purchasable)
+	SellPrice      int                   // Gold received when selling this item
+	Stackable      bool                  // Whether multiple units share one inventory slot
 }
 
-// ToItem creates a domain Item from template.
+// ToItem creates a mutable domain.Item from this immutable template.
+// Used by ShopService.BuyItem() and giveStartingItems() to create
+// new item instances for the player's inventory.
 func (t *ItemTemplate) ToItem() *domain.Item {
 	return &domain.Item{
-		ID:             t.ID,
-		Name:           t.Name,
-		Description:    t.Description,
-		Category:       t.Category,
-		ConsumableType: t.ConsumableType,
-		Value:          t.Value,
-		Duration:       t.Duration,
-		BuyPrice:       t.BuyPrice,
-		SellPrice:      t.SellPrice,
-		Stackable:      t.Stackable,
+		ID:             t.ID,             // Copy unique identifier
+		Name:           t.Name,           // Copy display name
+		Description:    t.Description,    // Copy flavor text
+		Category:       t.Category,       // Copy category (Consumable/Material)
+		ConsumableType: t.ConsumableType, // Copy effect type
+		Value:          t.Value,          // Copy effect magnitude
+		Duration:       t.Duration,       // Copy buff duration
+		BuyPrice:       t.BuyPrice,       // Copy purchase price
+		SellPrice:      t.SellPrice,      // Copy sell price
+		Stackable:      t.Stackable,      // Copy stacking behavior
 	}
 }
 
-// ItemRegistry holds all item templates.
+// ItemRegistry is the read-only data store for all item definitions.
+// Loaded once at application startup and shared across all services.
 type ItemRegistry struct {
-	items     map[string]*ItemTemplate
-	shopStock map[string]int // -1 = unlimited
+	items     map[string]*ItemTemplate // All items indexed by ID for O(1) lookup
+	shopStock map[string]int           // Shop availability: -1 = unlimited, 0 = sold out, >0 = remaining
 }
 
-// NewItemRegistry creates registry with all items from C items.c.
+// NewItemRegistry creates and initializes the item registry.
+// Loads all item definitions and shop stock levels, matching C items.c data.
 func NewItemRegistry() *ItemRegistry {
 	r := &ItemRegistry{
-		items:     make(map[string]*ItemTemplate),
-		shopStock: make(map[string]int),
+		items:     make(map[string]*ItemTemplate), // Initialize lookup map
+		shopStock: make(map[string]int),           // Initialize stock tracker
 	}
-	r.loadItems()
-	r.initShopStock()
+	r.loadItems()     // Populate item definitions (30+ items)
+	r.initShopStock() // Set initial shop stock levels
 	return r
 }
 
@@ -355,40 +366,46 @@ func (r *ItemRegistry) GetShopItems() []ShopItemEntry {
 	return result
 }
 
-// GetStock returns stock for item.
+// GetStock returns current stock level for an item.
+// Returns 0 for items not tracked in the shop stock system.
 func (r *ItemRegistry) GetStock(id string) int {
 	if stock, ok := r.shopStock[id]; ok {
-		return stock
+		return stock // Return current stock (-1, 0, or positive count)
 	}
-	return 0
+	return 0 // Item not in shop stock — treat as unavailable
 }
 
-// DecrementStock reduces stock by amount (for purchase).
+// DecrementStock reduces stock by the specified amount after a purchase.
+// Returns true if the decrement succeeded. Unlimited stock (-1) always succeeds.
+// NOTE: This method is currently NOT called by ShopService — see documentation.txt.
 func (r *ItemRegistry) DecrementStock(id string, amount int) bool {
 	if stock, ok := r.shopStock[id]; ok {
 		if stock == -1 {
-			return true // Unlimited
+			return true // Unlimited stock — always available, never decremented
 		}
 		if stock >= amount {
-			r.shopStock[id] -= amount
-			return true
+			r.shopStock[id] -= amount // Reduce available stock
+			return true               // Purchase succeeded
 		}
 	}
-	return false
+	return false // Item not found or insufficient stock
 }
 
-// ShopItemEntry represents an item in the shop.
+// ShopItemEntry combines an item template with its current stock level.
+// Used by ShopScreen to display items with availability information.
 type ShopItemEntry struct {
-	Item  *ItemTemplate
-	Stock int // -1 = unlimited, 0 = sold out
+	Item  *ItemTemplate // Pointer to immutable item definition
+	Stock int           // Current stock: -1 = unlimited, 0 = sold out, >0 = remaining
 }
 
-// IsSoldOut returns true if item is sold out.
+// IsSoldOut returns true if item has zero stock remaining.
+// Used by shop UI to gray out unavailable items.
 func (e ShopItemEntry) IsSoldOut() bool {
-	return e.Stock == 0
+	return e.Stock == 0 // Exactly zero — item was available but depleted
 }
 
-// IsUnlimited returns true if item has unlimited stock.
+// IsUnlimited returns true if item has infinite stock.
+// Used by shop UI to show "∞" instead of a stock count.
 func (e ShopItemEntry) IsUnlimited() bool {
-	return e.Stock == -1
+	return e.Stock == -1 // Sentinel value for unlimited availability
 }

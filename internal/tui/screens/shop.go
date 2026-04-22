@@ -1,4 +1,6 @@
-// Package screens provides game screen implementations for Block 3.
+// shop.go implements the buy/sell shop screen.
+// Displays weapon and item catalogs with prices, stock, and player gold.
+// Delegates transactions to ShopService.
 package screens
 
 import (

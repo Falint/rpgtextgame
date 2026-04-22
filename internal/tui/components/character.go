@@ -2,19 +2,20 @@
 package components
 
 import (
-	"fmt"
-	"strings"
+	"fmt"     // Sprintf for stat value formatting
+	"strings" // Builder for efficient string concatenation, Repeat for HP bar
 
-	"github.com/tenyom/textrpg-tui/internal/domain"
-	"github.com/tenyom/textrpg-tui/internal/tui/styles"
+	"github.com/tenyom/textrpg-tui/internal/domain"     // Player entity and weapon/buff types
+	"github.com/tenyom/textrpg-tui/internal/tui/styles" // Centralized style definitions
 )
 
-// HP display thresholds and bar sizing.
+// HP display thresholds and bar sizing constants.
+// Named constants prevent magic numbers in HP rendering logic.
 const (
-	HPLowThreshold = 0.3 // Show HP as red below 30%
-	HPBarMinWidth  = 10  // Minimum HP bar character width
-	HPBarMaxWidth  = 30  // Maximum HP bar character width
-	HPBarPadding   = 8   // Padding subtracted from panel width
+	HPLowThreshold = 0.3 // HP percentage below which text turns red (30%)
+	HPBarMinWidth  = 10  // Minimum character width for the HP bar
+	HPBarMaxWidth  = 30  // Maximum character width to prevent oversized bars
+	HPBarPadding   = 8   // Horizontal padding subtracted from panel width for bar sizing
 )
 
 // -----------------------------------------------------------------------------

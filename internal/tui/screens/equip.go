@@ -1,4 +1,6 @@
-// Package screens provides game screen implementations for Block 3.
+// equip.go implements the weapon equip/unequip screen.
+// Lists weapons in inventory and allows the player to change their
+// equipped weapon. Displays weapon stats, element, and tier.
 package screens
 
 import (

@@ -1,8 +1,13 @@
-// Package styles provides Lipgloss styles for the TextRPG TUI.
-// Following spiketrace pattern for consistency.
+// Package styles provides centralized Lipgloss style definitions for TextRPG.
+// All UI rendering references these styles rather than creating inline styles,
+// ensuring visual consistency across all screens and components.
+//
+// DESIGN: Styles are package-level variables (not functions) to avoid
+// repeated allocation. Lipgloss styles are immutable value types —
+// methods like .Width() return new copies rather than mutating.
 package styles
 
-import "github.com/charmbracelet/lipgloss"
+import "github.com/charmbracelet/lipgloss" // Terminal styling library for colors, borders, padding
 
 // -----------------------------------------------------------------------------
 // Color Palette (RPG Theme)

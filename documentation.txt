@@ -1,0 +1,999 @@
+================================================================================
+               TEXTRPG — COMPREHENSIVE CODEBASE DOCUMENTATION
+                    Version: Production Build (Go/BubbleTea)
+                    Module:  github.com/tenyom/textrpg-tui
+                    Generated: 2026-02-14
+================================================================================
+
+                        TABLE OF CONTENTS
+================================================================================
+
+    1. EXECUTIVE SUMMARY
+    2. PROJECT STRUCTURE
+    3. ARCHITECTURE OVERVIEW
+    4. DEPENDENCY FLOW
+    5. ENTRY POINT & EXECUTION FLOW
+    6. DETAILED FILE ANALYSIS
+       6.1  Root Level
+       6.2  Domain Layer
+       6.3  Application Layer
+       6.4  Infrastructure Layer
+       6.5  TUI Layer — Core
+       6.6  TUI Layer — Screens
+       6.7  TUI Layer — Components
+       6.8  TUI Layer — Styles
+    7. DESIGN PATTERNS & PRINCIPLES
+    8. DATA FLOW DIAGRAMS
+    9. POTENTIAL IMPROVEMENTS & RECOMMENDATIONS
+   10. GLOSSARY
+
+
+================================================================================
+1. EXECUTIVE SUMMARY
+================================================================================
+
+TextRPG is a terminal-based role-playing game built in Go using the Charm
+BubbleTea framework for terminal user interface (TUI) rendering. The project
+follows Clean Architecture principles with clear separation of concerns across
+four architectural layers:
+
+  - Domain Layer:          Pure business logic, no external dependencies.
+  - Application Layer:     Service orchestration (battle, shop, item usage).
+  - Infrastructure Layer:  Data registries (monsters, weapons, items, upgrades).
+  - Presentation Layer:    BubbleTea TUI with screens, components, and styles.
+
+The game features:
+  • Turn-based combat with elemental damage modifiers (Fire > Wind > Earth > Water > Fire)
+  • Weapon system with tier-based upgrades and elemental affinities
+  • Shop system for buying/selling weapons and consumables
+  • Inventory management with stacking, filtering, and slot-based storage
+  • Consumable items (healing potions, buff elixirs) with centralized effect processing
+  • Monster hierarchy (Normal, Elite, Boss) with loot tables
+  • Material/crafting system for weapon upgrades
+  • 3-panel TUI layout (Menu | Character Status | Game Screen)
+
+The codebase is a port of an original C implementation and maintains feature
+parity with the C version's data layer (items, monsters, weapons, upgrades).
+
+
+================================================================================
+2. PROJECT STRUCTURE
+================================================================================
+
+textrpg-tui/
+├── main.go                              # Entry point — bootstraps all layers
+├── go.mod                               # Go module definition & dependencies
+├── go.sum                               # Dependency checksums (auto-generated)
+├── Makefile                             # C-version build system (legacy)
+├── textrpg                              # Compiled Go binary
+├── README.md                            # Project documentation
+├── CODEBASE_DEEP_EXPLANATION.txt        # Previous documentation artifact
+├── documentation.txt                    # THIS FILE
+│
+├── internal/                            # Private application code (Go convention)
+│   ├── domain/                          # LAYER 1: Pure business entities & logic
+│   │   ├── element.go                   #   Elemental system (Fire/Water/Earth/Wind)
+│   │   ├── enemy.go                     #   Enemy entity, monster types, combat behavior
+│   │   ├── errors.go                    #   Domain error codes (ResultCode enum)
+│   │   ├── inventory.go                 #   Inventory management, item/weapon slots
+│   │   ├── player.go                    #   Player entity, stats, buffs, combat
+│   │   └── weapon.go                    #   Weapon entity, types, tier upgrades
+│   │
+│   ├── application/                     # LAYER 2: Use-case orchestration services
+│   │   ├── battle_service.go            #   Combat orchestration (turns, damage, rewards)
+│   │   ├── item_service.go              #   Centralized consumable effect processor
+│   │   └── shop_service.go              #   Buy/sell transactions
+│   │
+│   ├── infrastructure/                  # LAYER 3: Data providers (registries)
+│   │   └── registry/
+│   │       ├── items.go                 #   Item templates, shop stock, all item data
+│   │       ├── monsters.go              #   Monster templates, loot tables
+│   │       ├── upgrades.go              #   Upgrade recipes (weapon tier paths)
+│   │       └── weapons.go               #   Weapon templates, shop stock
+│   │
+│   └── tui/                             # LAYER 4: Terminal UI (BubbleTea)
+│       ├── model.go                     #   Root model (AppModel), service injection
+│       ├── view.go                      #   Root view renderer (3-panel layout)
+│       ├── update.go                    #   Root update handler, input routing
+│       ├── constants.go                 #   Layout constants (panel ratios, dimensions)
+│       │
+│       ├── screens/                     #   Game screens (Block 3 content)
+│       │   ├── interface.go             #   Screen interface + ScreenType enum
+│       │   ├── msg.go                   #   EndScreenMsg (screen completion signal)
+│       │   ├── battle.go                #   Battle screen (combat UI)
+│       │   ├── shop.go                  #   Shop screen (buy/sell UI)
+│       │   ├── upgrade.go               #   Weapon upgrade screen
+│       │   ├── equip.go                 #   Weapon equip screen
+│       │   ├── inventory.go             #   Inventory screen (view/use items)
+│       │   └── status.go               #   Player status screen
+│       │
+│       ├── components/                  #   Reusable UI components
+│       │   ├── constants.go             #   Menu item IDs, MenuItem struct
+│       │   ├── menu.go                  #   Main menu component (Block 1)
+│       │   └── character.go             #   Character status panel (Block 2)
+│       │
+│       └── styles/
+│           └── styles.go                #   Lipgloss style definitions
+│
+├── csrc/                                # Legacy C source (reference only)
+├── src/                                 # Legacy C source (reference only)
+└── build/                               # C build artifacts (reference only)
+
+
+================================================================================
+3. ARCHITECTURE OVERVIEW
+================================================================================
+
+The project follows the Clean Architecture pattern (a.k.a. Onion Architecture),
+where dependencies flow inward: outer layers depend on inner layers, but never
+the reverse.
+
+                    ┌───────────────────────────────────────┐
+                    │           TUI (Presentation)          │
+                    │   model.go, view.go, update.go        │
+                    │   screens/*, components/*, styles/*    │
+                    ├───────────────────────────────────────┤
+                    │        Application (Use Cases)         │
+                    │   battle_service.go                    │
+                    │   item_service.go                      │
+                    │   shop_service.go                      │
+                    ├───────────────────────────────────────┤
+                    │       Infrastructure (Data)            │
+                    │   registry/items.go                    │
+                    │   registry/monsters.go                 │
+                    │   registry/upgrades.go                 │
+                    │   registry/weapons.go                  │
+                    ├───────────────────────────────────────┤
+                    │         Domain (Core Logic)            │
+                    │   element.go, enemy.go, player.go      │
+                    │   weapon.go, inventory.go, errors.go   │
+                    └───────────────────────────────────────┘
+
+DEPENDENCY RULES:
+  • Domain depends on NOTHING external (pure Go, no imports from other layers)
+  • Infrastructure depends on Domain (uses domain types like Element, ItemCategory)
+  • Application depends on Domain + Infrastructure (orchestrates business actions)
+  • TUI depends on ALL layers (renders UI using services and domain entities)
+
+LAYER RESPONSIBILITIES:
+  • Domain:         Defines WHAT entities exist and HOW they behave in isolation.
+  • Infrastructure: Defines WHERE data comes from (in-memory registries).
+  • Application:    Defines HOW multi-entity workflows operate (battle turns, shop).
+  • TUI:            Defines HOW the user interacts with the system.
+
+
+================================================================================
+4. DEPENDENCY FLOW
+================================================================================
+
+main.go
+ ├── registry.NewMonsterRegistry()      → infrastructure/registry/monsters.go
+ ├── registry.NewWeaponRegistry()       → infrastructure/registry/weapons.go
+ ├── registry.NewItemRegistry()         → infrastructure/registry/items.go
+ ├── registry.NewUpgradeRegistry()      → infrastructure/registry/upgrades.go
+ ├── domain.NewPlayer()                 → domain/player.go
+ ├── application.NewItemService()       → application/item_service.go
+ ├── application.NewBattleService()     → application/battle_service.go
+ ├── application.NewShopService()       → application/shop_service.go
+ └── tui.NewAppModel()                  → tui/model.go
+      ├── components.NewMenu()          → tui/components/menu.go
+      ├── components.NewCharacter()     → tui/components/character.go
+      └── screens.New*Screen()          → tui/screens/*.go (created on demand)
+
+All dependencies are injected via constructors. There are NO global variables
+carrying mutable state. Each component receives its dependencies explicitly,
+enabling testability and clear ownership.
+
+
+================================================================================
+5. ENTRY POINT & EXECUTION FLOW
+================================================================================
+
+STARTUP SEQUENCE (main.go):
+  1. Create all four registries (monsters, weapons, items, upgrades).
+     These are read-only data stores populated at initialization.
+  2. Create a new Player with default configuration (100 HP, 150 Gold, 5 DEF).
+  3. Give starting equipment: 3x Small Potion + Iron Sword (equipped).
+  4. Create application services (ItemService, BattleService, ShopService).
+     ItemService is shared between BattleService and InventoryScreen.
+  5. Create AppModel (root TUI model) injecting all dependencies.
+  6. Start BubbleTea program with alternate screen mode.
+
+RUNTIME LOOP (BubbleTea Elm Architecture):
+  The application follows the Elm Architecture pattern:
+
+    Update(msg) → tea.Model, tea.Cmd
+    View()      → string
+
+  1. User presses a key → tea.KeyMsg is dispatched.
+  2. AppModel.Update() routes the message:
+     a. If menu is focused → menu.Update() handles navigation.
+     b. If Enter/number pressed → handleMenuSelect() creates appropriate screen.
+     c. If game screen focused → activeScreen.Update() handles screen-specific input.
+  3. AppModel.View() renders the 3-panel layout:
+     a. Block 1 (Left):   Menu component → main navigation.
+     b. Block 2 (Center): Character component → player status, HP bar, weapon.
+     c. Block 3 (Right):  Active screen → battle/shop/inventory/etc.
+  4. When a screen finishes → EndScreenMsg is sent → focus returns to menu.
+
+SHUTDOWN:
+  Exit via Ctrl+C or selecting "Exit" from main menu → tea.Quit command.
+
+
+================================================================================
+6. DETAILED FILE ANALYSIS
+================================================================================
+
+
+--------------------------------------------------------------------------------
+6.1 ROOT LEVEL
+--------------------------------------------------------------------------------
+
+FILE: main.go
+PURPOSE: Application entry point and composition root.
+ROLE: Wires all layers together using Dependency Injection.
+LINES: 75
+DEPENDENCIES: domain, application, infrastructure/registry, tui, bubbletea
+
+  This file is the COMPOSITION ROOT — the only place in the codebase where
+  concrete implementations are instantiated and wired together. It follows
+  the Dependency Injection principle by constructing all dependencies at the
+  top level and passing them down through constructors.
+
+  The giveStartingItems() helper function seeds the player with initial
+  equipment (3x Small Potion, 1x Iron Sword equipped), matching the C
+  version's initial game state.
+
+FILE: go.mod
+PURPOSE: Go module definition.
+LINES: 33
+MODULE: github.com/tenyom/textrpg-tui (Go 1.25.6)
+
+  Dependencies:
+  - github.com/charmbracelet/bubbletea  → TUI framework (Elm Architecture)
+  - github.com/charmbracelet/bubbles    → Pre-built TUI components (key bindings)
+  - github.com/charmbracelet/lipgloss   → Terminal styling (colors, borders)
+  All other dependencies are transitive (indirect).
+
+FILE: Makefile
+PURPOSE: Build system for the LEGACY C version (not the Go version).
+LINES: 84
+NOTE: This file is for the C codebase in src/. The Go version is built with:
+      go build -o textrpg
+
+
+--------------------------------------------------------------------------------
+6.2 DOMAIN LAYER (internal/domain/)
+--------------------------------------------------------------------------------
+
+FILE: element.go
+PURPOSE: Elemental type system and damage modification.
+LINES: 86
+DEPENDENCIES: None (pure domain logic)
+
+  Defines the Element type (an int enum) with four values: Fire, Water, Earth,
+  Wind, plus None for non-elemental entities.
+
+  Implements a rock-paper-scissors damage modifier system:
+    Fire  → strong vs Wind,  weak vs Water
+    Water → strong vs Fire,  weak vs Earth
+    Earth → strong vs Water, weak vs Wind
+    Wind  → strong vs Earth, weak vs Fire
+
+  Named constants prevent magic numbers:
+    ElementStrongMultiplier  = 2.0 (double damage on advantage)
+    ElementWeakMultiplier    = 0.5 (half damage on disadvantage)
+    ElementNeutralMultiplier = 1.0 (no elemental interaction)
+
+  The DamageModifier(target Element) method computes the multiplier when an
+  entity with this element attacks a target with the given element.
+
+FILE: enemy.go
+PURPOSE: Enemy entity definition and combat behavior.
+LINES: 76
+DEPENDENCIES: math/rand (for gold rolls), domain constants
+
+  Defines the Enemy struct with ID, Name, Type, Element, HP, Attack, Defense,
+  and gold range.
+
+  MonsterType enum categorizes enemies for difficulty scaling:
+    MonsterNormal → standard encounters
+    MonsterElite  → increased stats and better loot
+    MonsterBoss   → cannot be fled, highest rewards
+
+  Key methods:
+    IsAlive()     → checks if CurrentHP > 0
+    TakeDamage()  → applies damage with defense reduction (DEF * 0.5)
+                     enforces minimum damage of 1, returns true if killed
+    RollGold()    → random gold in [GoldMin, GoldMax] range
+    GetAttack()   → returns raw attack value
+    GetElement()  → returns elemental affinity
+
+FILE: errors.go
+PURPOSE: Domain-specific error types and result codes.
+LINES: 70
+DEPENDENCIES: None
+
+  Defines ResultCode enum used throughout the domain layer for operation
+  outcomes. This replaces Go's error interface with a structured, typed
+  error system specific to game operations:
+
+    ResultSuccess, ResultFail, ResultInventoryFull, ResultNotEnoughGold,
+    ResultNotEnoughMaterials, ResultItemNotFound, ResultInvalidSlot,
+    ResultInvalidTarget, ResultMaxTierReached, ResultCannotUpgrade
+
+  DomainError struct wraps a ResultCode with an optional message and
+  implements Go's error interface. Constructor functions NewError() and
+  NewErrorWithMessage() provide factory methods.
+
+FILE: inventory.go
+PURPOSE: Inventory management system with slot-based storage.
+LINES: 279
+DEPENDENCIES: None (pure domain)
+
+  This is the MOST COMPLEX domain file, implementing the complete inventory
+  subsystem.
+
+  TYPES:
+    InventorySlot → holds weapon OR item with quantity
+    SlotType      → Empty, Weapon, or Item
+    Item          → consumable or material definition
+    ItemCategory  → Consumable or Material
+    ConsumableType → None, Heal, BuffAtk, BuffDef, FullRestore
+    Inventory     → array of slots with max capacity
+    MaterialInfo  → display struct for materials
+
+  CONSTANTS:
+    MaxInventorySlots = 20 (matches C version)
+    MaxItemStackSize  = 99
+
+  KEY METHODS:
+    AddWeapon()      → finds first empty slot, returns ResultInventoryFull if full
+    AddItem()        → stacks with existing same-ID items, or finds empty slot
+    RemoveItem()     → decrements quantity, clears slot if quantity reaches 0
+    RemoveWeapon()   → removes weapon from slot, returns pointer to weapon
+    GetConsumables() → filtered view of consumable-category items only
+    GetMaterials()   → returns MaterialInfo slice for display
+    FindItemSlot()   → locates slot containing item by ID
+    CountItem()      → counts quantity of item by ID across slots
+    RemoveItemByID() → removes N units of item by ID across multiple slots
+
+FILE: player.go
+PURPOSE: Player entity with stats, equipment, buffs, and combat.
+LINES: 171
+DEPENDENCIES: domain constants
+
+  The central entity of the game. Holds all mutable player state:
+    Name, MaxHP, CurrentHP, BaseAttack, BaseDef, Gold,
+    EquippedWeapon (*Weapon), Inventory (*Inventory), Buffs ([]Buff)
+
+  BUFF SYSTEM:
+    Buff struct holds Type (BuffAttack/BuffDefense), Value (percentage),
+    and TurnsRemaining. Buffs are applied multiplicatively to stats.
+
+  COMBAT BALANCE CONSTANTS:
+    DefenseReductionRatio = 0.5 (defense reduces damage by 50% of DEF value)
+    DefaultBaseAttack = 10
+    MinDamage = 1 (prevents zero-damage hits)
+
+  CONSTRUCTOR:
+    NewPlayer(name, config) creates player with configurable starting stats.
+    DefaultPlayerConfig() returns: 100 HP, 150 Gold, 5 DEF.
+
+  KEY METHODS:
+    GetAttack()   → BaseAttack + weapon damage + buff bonuses (percentage)
+    GetDefense()  → BaseDef + buff bonuses (percentage)
+    TakeDamage()  → reduces HP by (amount - DEF*0.5), min 1 damage
+    Heal()        → restores HP capped at MaxHP
+    SpendGold()   → deducts gold, returns error if insufficient
+    AddBuff()     → appends temporary buff
+    TickBuffs()   → decrements durations, removes expired (uses slice reuse pattern)
+
+FILE: weapon.go
+PURPOSE: Weapon entity with type classification and tier upgrades.
+LINES: 68
+DEPENDENCIES: fmt (for display name formatting)
+
+  TYPES:
+    Weapon     → ID, Name, Description, Type, Element, BaseDamage, Tier, MaxTier
+    WeaponType → Fist, Sword, Axe, Staff, Bow, Dagger
+
+  TIER SYSTEM:
+    TierBonusPerLevel = 0.15 (15% damage increase per tier above 1)
+    Damage() = BaseDamage * (1.0 + (Tier-1) * 0.15)
+
+  The DisplayName() method appends "+N" suffix for upgraded weapons
+  (e.g., "Iron Sword +2" for Tier 3).
+
+
+--------------------------------------------------------------------------------
+6.3 APPLICATION LAYER (internal/application/)
+--------------------------------------------------------------------------------
+
+FILE: battle_service.go
+PURPOSE: Combat orchestration, turn management, and victory/defeat handling.
+LINES: 271
+DEPENDENCIES: domain, infrastructure/registry, math/rand, fmt
+
+  DESIGN PATTERN: Service (orchestrates multi-entity business operations)
+
+  BattleState enum: None, PlayerTurn, EnemyTurn, Won, Lost, Escaped
+
+  COMBAT BALANCE:
+    CriticalHitChance     = 0.10 (10% crit rate)
+    CriticalHitMultiplier = 1.5  (150% damage on crit)
+    EscapeChance          = 0.5  (50% flee success, bosses cannot be fled)
+    battleLogCapacity     = 20   (ring buffer for combat log)
+
+  KEY METHODS:
+    StartBattle()   → picks random monster of given type, initializes combat
+    Attack()        → player attacks enemy with weapon damage + element modifier + crit roll
+    UseItem()       → delegates to ItemService for effect, removes item on success
+    TryEscape()     → 50% chance, blocked for bosses
+    enemyTurn()     → enemy attacks player, ticks buffs after full round
+    onEnemyDefeated() → grants gold reward, sets BattleWon state
+
+  The UseItem() method demonstrates the centralized pattern: it validates the
+  slot, delegates effect application to ItemService, and only removes the item
+  and advances the turn if the effect succeeded.
+
+FILE: item_service.go
+PURPOSE: Centralized consumable effect processor (Single Source of Truth).
+LINES: 163
+DEPENDENCIES: domain, fmt
+
+  DESIGN RATIONALE:
+    This service was created to eliminate duplicated item-effect logic between
+    BattleService and InventoryScreen. Previously, BattleService used
+    player.Heal() while InventoryScreen directly mutated player.CurrentHP.
+    Buff logic was entirely missing from the inventory path. This service
+    unifies both paths.
+
+  UseResult struct separates:
+    Success → whether the effect was applied
+    Message → human-readable outcome (for UI display)
+    Error   → reason for failure (for UI display)
+
+  UseConsumable() dispatches by ConsumableType:
+    ConsumeHeal       → heals by item.Value, fails if HP full
+    ConsumeFullRestore → sets HP to max, fails if HP full
+    ConsumeBuffAtk    → adds attack buff for item.Duration turns
+    ConsumeBuffDef    → adds defense buff for item.Duration turns
+
+  IMPORTANT: This service does NOT remove items from inventory. The caller
+  is responsible for removal, as different contexts use different removal
+  strategies (slot-index in battle, consumable-index in inventory).
+
+FILE: shop_service.go
+PURPOSE: Buy/sell transaction management.
+LINES: 128
+DEPENDENCIES: domain, infrastructure/registry
+
+  CONSTANTS:
+    DefaultSellRatio = 0.5 (player receives 50% of base sell price)
+
+  KEY METHODS:
+    BuyWeapon()     → validates gold, creates weapon from template, adds to inventory
+    BuyItem()       → validates gold, creates item from template, adds to inventory
+    SellItem()      → handles both weapon and item selling from inventory slots
+    GetShopWeapons() → delegates to WeaponRegistry for stock info
+    GetShopItems()   → delegates to ItemRegistry for stock info
+
+  NOTE: The sell ratio is applied only to weapon sell prices (calculated from
+  template). Item sell prices use the direct SellPrice field from the item.
+
+
+--------------------------------------------------------------------------------
+6.4 INFRASTRUCTURE LAYER (internal/infrastructure/registry/)
+--------------------------------------------------------------------------------
+
+FILE: items.go
+PURPOSE: Item data registry with 30+ item templates and shop stock management.
+LINES: 395
+DEPENDENCIES: domain (for type constants)
+
+  DESIGN PATTERN: Repository/Registry (read-only data store with query methods)
+
+  ITEM CATEGORIES:
+    Consumables (9 items):
+      Healing:  Small Potion (30HP), Medium Potion (60HP), Large Potion (100HP),
+                Full Restore (max HP)
+      Buffs:    Attack Elixir (+25% ATK/3t), Defense Elixir (+25% DEF/3t),
+                Power Surge (+50% ATK/2t), Iron Skin (+50% DEF/2t)
+      Utility:  Antidote (cures poison — placeholder, ConsumeNone type)
+
+    Materials - Common (6):  Slime Gel, Goblin Fang, Bat Wing, Wolf Pelt,
+                             Wolf Fang, Bone Fragment
+    Materials - Elemental (8): Fire/Water/Earth/Wind Essence,
+                               Ember Stone, Aqua Crystal, Stone Core,
+                               Gale Feather, Orc Tusk
+    Materials - Boss (7):    Dragon Scale, Dragon Fang, Kraken Tentacle,
+                             Deep Sea Pearl, Titan Heart, Adamant Ore,
+                             Legendary Ore
+
+  SHOP STOCK: Items with BuyPrice > 0 appear in shop.
+    Unlimited (-1): most potions and elixirs
+    Limited:        Full Restore (5), Power Surge (3), Iron Skin (3)
+
+FILE: monsters.go
+PURPOSE: Monster data registry with type-based categorization and loot tables.
+LINES: 178
+DEPENDENCIES: domain, math/rand
+
+  MONSTER ROSTER:
+    Normal (5):  Slime (Water), Goblin (None), Wild Wolf (Wind),
+                 Skeleton (None), Giant Bat (Wind)
+    Elite (3):   Goblin Chief (Fire), Dire Wolf (Wind), Flame Elemental (Fire)
+    Boss (2):    Ancient Dragon (Fire, 200HP), Lich King (None, 180HP)
+
+  Each MonsterTemplate includes a LootTable defining drop chances.
+  The GetRandom(type) method selects a uniformly random monster of the
+  specified difficulty tier for encounter generation.
+
+FILE: upgrades.go
+PURPOSE: Weapon upgrade recipe definitions.
+LINES: 268
+DEPENDENCIES: domain types (indirect)
+
+  Defines UpgradeRecipe and UpgradeMaterial types. Each recipe maps
+  a (WeaponID, FromTier) pair to:
+    - ToTier     (target tier)
+    - GoldCost   (gold required)
+    - Materials  (list of {ItemID, Quantity})
+    - DamageBonus (base damage increase)
+
+  UPGRADE PATHS (6 weapons, 4 tiers each = 24 recipes):
+    Iron Sword:    Tiers 1→5, materials from goblin/wolf/orc/legendary
+    Fire Blade:    Tiers 1→5, fire essences + ember stones + dragon parts
+    Aqua Saber:    Tiers 1→5, water essences + aqua crystals + kraken parts
+    Earth Cleaver: Tiers 1→5, earth essences + stone cores + titan parts
+    Wind Cutter:   Tiers 1→5, wind essences + gale feathers + bat wings
+    Iron Axe:      Tiers 1→5, wolf/orc/stone/adamant/legendary materials
+
+  Gold costs escalate: ~80-120 for Tier 1→2, up to 700-800 for Tier 4→5.
+
+FILE: weapons.go
+PURPOSE: Weapon data registry with 20 weapon templates and shop stock.
+LINES: 304
+DEPENDENCIES: domain
+
+  WEAPON CATEGORIES:
+    Starter/Basic: Fists (5 DMG), Rusty Sword (8 DMG)
+    Swords (6):    Iron Sword, Steel Sword, Fire Blade, Aqua Saber,
+                   Earth Cleaver, Wind Cutter
+    Axes (2):      Iron Axe, Battle Axe
+    Staves (3):    Wooden Staff, Fire Staff, Ice Staff
+    Daggers (2):   Iron Dagger, Assassin Blade
+    Bows (2):      Hunting Bow, Gale Bow
+    Legendary (2): Dragon Slayer (45 DMG), Titan's Hammer (50 DMG) — craft only
+
+  SHOP STOCK:
+    Unlimited: Iron Sword, Steel Sword, Iron Axe, Wooden Staff, Iron Dagger,
+               Hunting Bow
+    Limited (1): Fire Blade, Aqua Saber, Earth Cleaver, Wind Cutter,
+                 Fire Staff, Ice Staff, Assassin Blade, Gale Bow
+    Not Sold: Fists, Rusty Sword, Battle Axe, Dragon Slayer, Titan's Hammer
+
+
+--------------------------------------------------------------------------------
+6.5 TUI LAYER — CORE (internal/tui/)
+--------------------------------------------------------------------------------
+
+FILE: model.go
+PURPOSE: Root BubbleTea model (composition root for UI layer).
+LINES: 75
+DEPENDENCIES: All layers (domain, application, infrastructure, screens, components)
+
+  AppModel struct holds:
+    - Domain entity:  *domain.Player
+    - Services:       ShopService, BattleService, ItemService
+    - Registries:     WeaponRegistry, ItemRegistry, MonsterRegistry, UpgradeRegistry
+    - UI Components:  Menu (Block 1), Character (Block 2)
+    - Active Screen:  Screen interface (Block 3, nil when no screen active)
+    - Layout State:   width, height, focusedPanel
+
+  NewAppModel() is the UI composition root — it creates Menu and Character
+  components and stores all injected dependencies.
+
+  Init() returns nil (no initialization commands needed).
+
+FILE: view.go
+PURPOSE: Root view renderer implementing the 3-panel horizontal layout.
+LINES: 70
+DEPENDENCIES: lipgloss, styles
+
+  The View() method assembles the full terminal UI:
+    1. Renders Menu, Character, and Game panels
+    2. Joins them horizontally with lipgloss.JoinHorizontal()
+    3. Adds header ("TEXT RPG - PRODUCTION BUILD (Go)") and footer (help text)
+    4. Returns the complete frame via lipgloss.JoinVertical()
+
+  wrapGamePanel() applies panel styling and calculates width using the
+  12-column grid system: Menu=2/12, remaining split 50/50 for Char and Game.
+
+FILE: update.go
+PURPOSE: Root input handler and message router.
+LINES: 149
+DEPENDENCIES: domain, components, screens, bubbletea
+
+  Update() is the central message dispatcher:
+    - Ctrl+C         → tea.Quit
+    - WindowSizeMsg  → recalculates panel dimensions
+    - EndScreenMsg   → closes active screen, returns focus to menu
+    - KeyMsg (menu)  → routes to menu.Update() + checks for selection
+    - KeyMsg (game)  → routes to activeScreen.Update()
+
+  handleMenuSelect() switches on menu item ID to create the appropriate
+  screen (Battle, Shop, Upgrade, Equip, Inventory, Status).
+
+  resizeComponents() calculates panel widths using the 12-column grid:
+    menuWidth = (mainWidth * 2) / 12
+    remaining = mainWidth - menuWidth
+    charWidth = remaining / 2
+    gameWidth = remaining - charWidth
+
+  The type assertion m.activeScreen.(interface{ SetSize(int, int) }) handles
+  the SetSize propagation to screens in a type-safe manner.
+
+FILE: constants.go
+PURPOSE: Layout constants for the 3-panel system.
+LINES: 39
+DEPENDENCIES: None
+
+  Panel indices: PanelMenu=0, PanelCharacter=1, PanelGame=2
+  Panel ratios:  Menu=2/12, Character=5/12, Game=5/12
+  Layout:        MinWidth=100, MinHeight=30, HeaderHeight=1, StatusBarHeight=1
+
+
+--------------------------------------------------------------------------------
+6.6 TUI LAYER — SCREENS (internal/tui/screens/)
+--------------------------------------------------------------------------------
+
+FILE: interface.go
+PURPOSE: Screen interface contract and screen type enumeration.
+LINES: 35
+DEPENDENCIES: bubbletea
+
+  Screen interface defines 4 methods every screen must implement:
+    Update(msg tea.Msg) tea.Cmd → handle input
+    View() string                → render content
+    Title() string               → return header title
+    SetSize(width, height int)   → accept dimension updates
+
+  ScreenType enum (unused at runtime, serves as documentation):
+    ScreenMainMenu, ScreenBattle, ScreenShop, ScreenUpgrade,
+    ScreenEquip, ScreenInventory, ScreenStatus
+
+FILE: msg.go
+PURPOSE: Inter-component messages for screen lifecycle.
+LINES: 14
+DEPENDENCIES: bubbletea
+
+  EndScreenMsg is a signal struct (zero-byte, no data) that screens emit
+  via EndScreenCmd() when they want to close and return focus to the menu.
+  This implements the Command pattern from the Elm Architecture.
+
+FILE: battle.go
+PURPOSE: Combat screen with turn-based interaction.
+LINES: 352
+DEPENDENCIES: application (BattleService), domain (Player), styles, bubbletea
+
+  MODES: BattleModeMain (attack/item/run), BattleModeItemSelect, BattleModeResult
+
+  RENDERING: Enemy status (name, HP, element), battle log (last 8 entries),
+  action menu, item selection list, victory/defeat/escape result.
+
+  The screen displays elemental tags for Elite/Boss monsters and colors HP
+  red when below 30%.
+
+  Item usage delegates to BattleService which in turn delegates to ItemService
+  (centralized effect processing).
+
+FILE: shop.go
+PURPOSE: Buy/sell screen with multi-mode navigation.
+LINES: 497
+DEPENDENCIES: application (ShopService), registries, domain (Player), styles
+
+  MODES: ShopModeMain (buy weapons/buy items/sell/exit),
+         ShopModeBuyWeapons, ShopModeBuyItems, ShopModeSell
+
+  Weapon list shows element-colored names, prices (red if unaffordable),
+  damage values, element tags, and stock counts.
+
+  Item list shows names, prices, descriptions, and stock.
+
+  Sell list shows inventory contents with calculated sell values.
+
+FILE: upgrade.go
+PURPOSE: Weapon upgrade screen with material requirements display.
+LINES: 513
+DEPENDENCIES: domain, registries (weapon, item, upgrade), styles
+
+  MODES: UpgradeModeMain, UpgradeModeViewEquipped, UpgradeModeViewInventory,
+         UpgradeModeDetails
+
+  Shows upgradeable weapons with "READY" or "missing materials" status.
+  Displays material requirements with have/need counts and OK/NEED indicators.
+  Performs upgrade by deducting gold, consuming materials, and incrementing
+  weapon tier/base damage.
+
+FILE: equip.go
+PURPOSE: Weapon equip/swap screen.
+LINES: 193
+DEPENDENCIES: domain (Player, Weapon), styles
+
+  Shows currently equipped weapon with damage, then lists inventory weapons.
+  On equip: returns old weapon to inventory, removes new weapon from inventory,
+  sets as equipped. Uses an equippableEntry helper struct to track slot indices.
+
+FILE: inventory.go
+PURPOSE: Inventory management screen with categorized views and item usage.
+LINES: 352
+DEPENDENCIES: application (ItemService), domain (Player), styles
+
+  MODES: InventoryModeMain (5 options), InventoryModeWeapons (view only),
+         InventoryModeConsumables (view only), InventoryModeMaterials (view only),
+         InventoryModeUse (use consumable)
+
+  Item usage delegates to ItemService (shared with BattleService) for
+  consistent effect handling. After successful use, finds the actual inventory
+  slot index of the Nth consumable and removes one unit.
+
+FILE: status.go
+PURPOSE: Player status display (read-only).
+LINES: 129
+DEPENDENCIES: domain (Player), styles
+
+  Shows: Name, HP, Gold, Base/Total Attack/Defense (with +bonus display),
+  equipped weapon details (name, type, damage, element), active buffs.
+  No input handler beyond Esc to exit.
+
+
+--------------------------------------------------------------------------------
+6.7 TUI LAYER — COMPONENTS (internal/tui/components/)
+--------------------------------------------------------------------------------
+
+FILE: constants.go
+PURPOSE: Menu item identifiers and MenuItem struct definition.
+LINES: 42
+DEPENDENCIES: None
+
+  Defines constant IDs for all 9 main menu items:
+    MenuBattleNormal, MenuBattleElite, MenuBattleBoss, MenuShop,
+    MenuUpgrade, MenuEquip, MenuInventory, MenuStatus, MenuExit
+
+  MenuItem struct: { ID string, Label string, Key string }
+  MainMenuItems() returns the ordered list of all menu options.
+
+FILE: menu.go
+PURPOSE: Main navigation menu component (Block 1).
+LINES: 154
+DEPENDENCIES: styles, bubbletea, bubbles/key
+
+  Renders the left-side menu panel with numbered items (1-9).
+  Supports arrow key navigation (up/down/j/k) and number key direct selection.
+  Applies focused/unfocused panel styles via applyPanelStyle().
+  Output format matches the C version's print_main_menu() function.
+
+FILE: character.go
+PURPOSE: Player status display panel (Block 2).
+LINES: 267
+DEPENDENCIES: domain (Player), styles
+
+  Renders the center panel with:
+    - Title: "⚔️ CHARACTER STATUS"
+    - HP value (green/red based on 30% threshold)
+    - Visual HP bar using ██ (filled) and ░░ (empty) characters
+    - Gold display
+    - ATK/DEF values
+    - Equipped weapon (element-colored name + damage)
+    - Active buffs list
+    - ASCII art warrior sprite
+
+  HP bar width is dynamic: panel width minus padding, clamped to [10, 30].
+
+
+--------------------------------------------------------------------------------
+6.8 TUI LAYER — STYLES (internal/tui/styles/)
+--------------------------------------------------------------------------------
+
+FILE: styles.go
+PURPOSE: Centralized Lipgloss style definitions (design system).
+LINES: 257
+DEPENDENCIES: lipgloss
+
+  ORGANIZED INTO SECTIONS:
+    Color Palette:     22 named colors in RPG theme
+    Panel Styles:      BasePanelStyle (rounded border), ActivePanelStyle (blue border)
+    Menu Item Styles:  SelectedItemStyle (white-on-blue), NormalItemStyle, DisabledItemStyle
+    Character Stats:   StatLabelStyle, StatValueStyle, GoldStyle, HPFullStyle, HPLowStyle
+    Combat:            DamageStyle, HealStyle, CritStyle, BuffStyle, EnemyNameStyle
+    Shop:              PriceStyle, SoldOutStyle, AffordableStyle, NotAffordableStyle
+    Elements:          FireStyle, WaterStyle, EarthStyle, WindStyle
+    Status Bar:        StatusBarStyle, HelpKeyStyle, HelpDescStyle
+    General:           LoadingStyle, ErrorStyle, SuccessStyle, SectionHeaderStyle,
+                       SeparatorStyle, DimItemStyle, CategoryMaterial
+
+  Design Decision: All styles are package-level variables (not functions).
+  This avoids re-creating style objects on every render call while maintaining
+  immutability (Lipgloss styles are value types).
+
+
+================================================================================
+7. DESIGN PATTERNS & PRINCIPLES
+================================================================================
+
+1. CLEAN ARCHITECTURE (Onion/Hexagonal)
+   Domain layer has ZERO external dependencies. All business rules live in
+   pure Go with no framework coupling. The TUI layer can be replaced with
+   a different UI framework without changing domain or application logic.
+
+2. DEPENDENCY INJECTION
+   All services and registries are constructed in main.go and injected
+   through constructors. No global state, no singleton patterns.
+
+3. REGISTRY PATTERN
+   Data registries (items, weapons, monsters, upgrades) act as read-only
+   data stores. They encapsulate data loading and provide typed query
+   methods (GetByID, GetAll, GetByType, GetRandom).
+
+4. ELM ARCHITECTURE (TEA — The Elm Architecture)
+   BubbleTea implements Model-Update-View:
+   - Model: AppModel holds all state
+   - Update: processes messages, returns new model + commands
+   - View: renders model state to string
+
+5. COMMAND PATTERN
+   BubbleTea commands (tea.Cmd) encapsulate side effects. EndScreenCmd()
+   creates a command that emits EndScreenMsg when executed.
+
+6. TEMPLATE PATTERN (Registry Templates → Domain Entities)
+   MonsterTemplate.ToEnemy(), WeaponTemplate.ToWeapon(), ItemTemplate.ToItem()
+   create mutable domain entities from immutable template data.
+
+7. SINGLE SOURCE OF TRUTH (ItemService)
+   Consumable effect logic is centralized in ItemService, preventing
+   duplication between BattleService and InventoryScreen.
+
+8. STRATEGY PATTERN (Screen Interface)
+   The Screen interface allows AppModel to swap game screens without
+   knowledge of concrete implementations.
+
+9. NAMED CONSTANTS (No Magic Numbers)
+   All numeric values have descriptive constant names:
+   DefenseReductionRatio, CriticalHitChance, MaxInventorySlots, etc.
+
+
+================================================================================
+8. DATA FLOW DIAGRAMS
+================================================================================
+
+BATTLE FLOW:
+  Menu "Battle (Normal)" →
+    handleMenuSelect() →
+      BattleService.StartBattle(MonsterNormal) →
+        MonsterRegistry.GetRandom(Normal) →
+          MonsterTemplate.ToEnemy() →
+            BattleScreen created, focus shifts to game panel →
+              Player selects "Attack" →
+                BattleService.Attack() →
+                  Player.GetAttack() + Weapon.Element.DamageModifier() →
+                    Enemy.TakeDamage() →
+                      [If killed] → BattleService.onEnemyDefeated() →
+                        Enemy.RollGold() → Player.AddGold() →
+                          BattleWon → BattleModeResult →
+                            Enter pressed → EndScreenMsg → Menu
+
+ITEM USAGE (Battle):
+  BattleScreen "Use Item" →
+    Player.Inventory.GetConsumables() →
+      Select item → findConsumableSlotIndex() →
+        BattleService.UseItem(slotIndex) →
+          ItemService.UseConsumable(item) →
+            [ConsumeHeal] → Player.Heal() → UseResult{Success=true}
+            → RemoveItem(slotIndex, 1)
+            → BattleEnemyTurn → enemyTurn()
+
+ITEM USAGE (Inventory — same path):
+  InventoryScreen "Use Item" →
+    ItemService.UseConsumable(item) → [same effect logic]
+      → findConsumableSlotIndex() → RemoveItem()
+
+SHOP PURCHASE:
+  ShopScreen "Buy Weapons" →
+    WeaponRegistry.GetShopWeapons() →
+      Select weapon → ShopService.BuyWeapon(weaponID) →
+        WeaponTemplate → Player.Gold check → Inventory.AddWeapon()
+        → Gold deducted → Success message
+
+
+================================================================================
+9. POTENTIAL IMPROVEMENTS & RECOMMENDATIONS
+================================================================================
+
+1. LOOT TABLE PROCESSING
+   The BattleService.onEnemyDefeated() method has a TODO comment for loot
+   drops. MonsterTemplate.LootTable is defined but never processed during
+   combat. This should be implemented to generate item drops based on
+   drop chances after defeating monsters.
+
+2. SHOP STOCK DECREMENT
+   WeaponRegistry and ItemRegistry have DecrementStock() methods, but
+   ShopService.BuyWeapon() and BuyItem() do not call them. Limited-stock
+   items are never actually decremented, making stock limits purely cosmetic.
+
+3. ANTIDOTE CONSUMABLE TYPE
+   The Antidote item has ConsumableType = ConsumeNone, meaning ItemService
+   will reject its usage with "This item cannot be used." Either add a
+   poison/status system or change the antidote's type.
+
+4. INTERFACE ABSTRACTION FOR SERVICES
+   BattleService, ShopService, and ItemService are concrete types injected
+   directly. Defining interfaces for these services would improve testability
+   and enable mock injection for unit tests.
+
+5. WEAPON SELL PRICE INCONSISTENCY
+   ShopService.SellItem() applies sellRatio (0.5) only to weapon sell prices
+   from the template, but uses item.SellPrice directly for items without
+   applying the ratio. This creates an inconsistent pricing model.
+
+6. CURSOR CLAMPING DUPLICATION
+   Every screen (Battle, Shop, Upgrade, Equip, Inventory) has its own
+   clampCursor() method with identical logic. This should be extracted
+   into a shared utility function.
+
+7. BUFFER REUSE IN TICK BUFFS
+   Player.TickBuffs() uses the "slice reuse" pattern (active := p.Buffs[:0])
+   which is memory-efficient but may cause subtle bugs if any code holds
+   references to the old Buffs slice, as the old entries are not zeroed.
+
+8. ERROR HANDLING IN EQUIP SCREEN
+   EquipScreen.handleEquip() calls AddWeapon() for the old weapon but does
+   not check the return code. If inventory is full, the old weapon would be
+   silently lost. This should be validated before removing the new weapon.
+
+9. PERSISTENT STATE
+   There is no save/load system. Game state is lost on exit. Implementing
+   serialization (JSON/GOB) for Player and Inventory would enable saving.
+
+10. SCREEN RESIZING ROBUSTNESS
+    The SetSize type assertion in resizeComponents() uses an interface check
+    that won't fail silently. However, the Screen interface already has
+    SetSize() — the type assertion is redundant and should use the interface
+    method directly.
+
+
+================================================================================
+10. GLOSSARY
+================================================================================
+
+  ATK           Attack power (base + weapon + buffs)
+  BubbleTea     Go TUI framework implementing the Elm Architecture
+  Buff          Temporary stat modification (percentage-based)
+  Clean Arch    Architectural pattern with unidirectional dependency flow
+  Composition   The place where concrete types are instantiated and wired
+    Root
+  Consumable    Item that is destroyed on use (potions, elixirs)
+  Crit          Critical hit (10% chance, 1.5x damage)
+  DEF           Defense stat (reduces incoming damage by DEF * 0.5)
+  DI            Dependency Injection
+  Domain        Business logic layer (pure, no external dependencies)
+  Elm Arch      Model-Update-View reactive architecture pattern
+  Elite         Mid-tier monster difficulty (higher stats, better loot)
+  Element       Fire/Water/Earth/Wind affinity for RPS damage system
+  Gold          In-game currency
+  HP            Hit Points (health)
+  Lipgloss      Terminal styling library (colors, borders, padding)
+  Material      Non-consumable crafting ingredient (monster drops)
+  MaxTier       Maximum upgrade level for a weapon (usually 5)
+  Registry      Read-only data store for game entity templates
+  ResultCode    Typed domain operation outcome (Success, Fail, etc.)
+  Slot          Inventory position (holds weapon or item with quantity)
+  Tea           Short for BubbleTea (TUI framework)
+  Template      Immutable data definition used to create mutable instances
+  Tier          Weapon upgrade level (1 = base, higher = stronger)
+  TUI           Terminal User Interface
+
+================================================================================
+                        END OF DOCUMENTATION
+================================================================================

@@ -1,51 +1,57 @@
-// Package registry provides data registries for game entities.
-// All data here EXACTLY matches C src/data/*.c files.
+// Package registry provides read-only data registries for game entities.
+// All weapon data EXACTLY matches C src/data/weapons.c for feature parity.
 package registry
 
-import "github.com/tenyom/textrpg-tui/internal/domain"
+import "github.com/tenyom/textrpg-tui/internal/domain" // Domain types for WeaponType, Element, Weapon
 
-// WeaponTemplate is a read-only weapon definition.
+// WeaponTemplate is an immutable weapon definition loaded at startup.
 // Matches C src/data/weapons.c WeaponTemplate struct.
+// Templates are never modified — mutable domain.Weapon instances are
+// created via ToWeapon() when purchased or given to the player.
 type WeaponTemplate struct {
-	ID          string
-	Name        string
-	Description string
-	Type        domain.WeaponType
-	Element     domain.Element
-	BaseDamage  int
-	BuyPrice    int // 0 = not buyable
-	SellPrice   int
-	MaxTier     int
+	ID          string            // Unique key (e.g., "iron_sword", "fire_blade")
+	Name        string            // Display name for shop/inventory UI
+	Description string            // Flavor text for weapon details
+	Type        domain.WeaponType // Weapon category (Sword, Axe, Staff, Bow, Dagger)
+	Element     domain.Element    // Elemental affinity for damage modifiers
+	BaseDamage  int               // Base damage before tier multiplication
+	BuyPrice    int               // Shop purchase cost in gold (0 = not purchasable)
+	SellPrice   int               // Gold received when selling this weapon
+	MaxTier     int               // Maximum upgrade tier (typically 5)
 }
 
-// ToWeapon creates a Weapon instance from template.
+// ToWeapon creates a mutable domain.Weapon from this immutable template.
+// New weapons always start at Tier 1 (base stats, no upgrade bonuses).
+// Called by ShopService.BuyWeapon() and giveStartingItems().
 func (t *WeaponTemplate) ToWeapon() *domain.Weapon {
 	return &domain.Weapon{
-		ID:          t.ID,
-		Name:        t.Name,
-		Description: t.Description,
-		Type:        t.Type,
-		Element:     t.Element,
-		BaseDamage:  t.BaseDamage,
-		Tier:        1,
-		MaxTier:     t.MaxTier,
+		ID:          t.ID,          // Copy identifier
+		Name:        t.Name,        // Copy display name
+		Description: t.Description, // Copy flavor text
+		Type:        t.Type,        // Copy weapon category
+		Element:     t.Element,     // Copy elemental affinity
+		BaseDamage:  t.BaseDamage,  // Copy base damage value
+		Tier:        1,             // All new weapons start at Tier 1
+		MaxTier:     t.MaxTier,     // Copy maximum upgrade tier
 	}
 }
 
-// WeaponRegistry holds all weapon templates.
+// WeaponRegistry is the read-only data store for all weapon definitions.
+// Supports lookup by ID and shop stock management.
 type WeaponRegistry struct {
-	weapons   map[string]*WeaponTemplate
-	shopStock map[string]int // -1 = unlimited, 0 = sold out
+	weapons   map[string]*WeaponTemplate // All weapons indexed by ID for O(1) lookup
+	shopStock map[string]int             // Shop availability: -1 = unlimited, 0 = sold out, >0 = remaining
 }
 
-// NewWeaponRegistry creates registry with all weapons from C weapons.c.
+// NewWeaponRegistry creates and initializes the weapon registry.
+// Loads all 18 weapon templates and sets initial shop stock levels.
 func NewWeaponRegistry() *WeaponRegistry {
 	r := &WeaponRegistry{
-		weapons:   make(map[string]*WeaponTemplate),
-		shopStock: make(map[string]int),
+		weapons:   make(map[string]*WeaponTemplate), // Initialize ID lookup map
+		shopStock: make(map[string]int),             // Initialize stock tracker
 	}
-	r.loadWeapons()
-	r.initShopStock()
+	r.loadWeapons()   // Populate 18 weapon definitions
+	r.initShopStock() // Set initial shop stock levels
 	return r
 }
 

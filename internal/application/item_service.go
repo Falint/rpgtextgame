@@ -1,162 +1,149 @@
-// Package application provides game services and orchestration.
-//
-// item_service.go — Centralized Item Effect Processor
-//
-// RESPONSIBILITY:
-//
-//	This service is the single source of truth for applying consumable item
-//	effects to a player. Both BattleService and InventoryScreen delegate
-//	item effect logic here, ensuring consistent behavior across all contexts.
-//
-// DESIGN RATIONALE:
-//
-//	Previously, item effects were duplicated: BattleService used player.Heal()
-//	while InventoryScreen manually mutated player.CurrentHP. Buff logic was
-//	entirely missing from inventory. This service eliminates that duplication
-//	and enforces validation (e.g., HP-full check) in one place.
-//
-// DEPENDENCIES:
-//   - domain.Player (target of all effects)
-//   - domain.Item / domain.ConsumableType (defines what effect to apply)
-//
-// DOES NOT:
-//   - Remove items from inventory (callers handle this — different contexts
-//     use different removal strategies: slot-index in battle, item-ID in inventory)
-//   - Manage battle turns or UI state
 package application
 
 import (
-	"fmt"
+	"fmt" // Sprintf for building result messages
 
-	"github.com/tenyom/textrpg-tui/internal/domain"
+	"github.com/tenyom/textrpg-tui/internal/domain" // Domain types for player, item, buff operations
 )
 
-// -----------------------------------------------------------------------------
-// Item Service — Centralized Consumable Effect Processor
-// -----------------------------------------------------------------------------
-
-// UseResult carries the outcome of attempting to use a consumable item.
-// It separates success/failure state from display messages, allowing callers
-// (battle UI, inventory UI, future quick-use) to handle presentation independently.
+// UseResult encapsulates the outcome of using a consumable item.
+// Separates success/failure from messages, allowing callers to handle
+// both UI feedback (Message/Error) and control flow (Success) independently.
 type UseResult struct {
-	// Success indicates whether the item effect was applied.
-	// When false, the item should NOT be removed from inventory.
-	Success bool
-
-	// Message is a human-readable description of the outcome.
-	// Examples: "Recovered 30 HP!", "ATK +25% for 3 turns."
-	Message string
-
-	// Error is set only when Success is false.
-	// Examples: "HP is already full!", "Cannot use this item."
-	Error string
+	Success bool   // Whether the effect was applied — true means item should be consumed
+	Message string // Human-readable outcome message for successful use
+	Error   string // Human-readable reason for failure (empty on success)
 }
 
-// ItemService processes consumable item effects on a player.
-// It applies validation and effects but does NOT manage inventory removal —
-// that responsibility belongs to the caller's context.
+// ItemService processes consumable item effects.
+// DESIGN: This service is the Single Source of Truth for item effects.
+// It is shared between BattleService and InventoryScreen to ensure:
+//   - Identical validation (e.g., "HP already full" check)
+//   - Identical effect application (e.g., exact heal amount)
+//   - Consistent buff behavior (duration, percentage values)
+//
+// IMPORTANT: This service does NOT remove items from inventory.
+// The caller handles removal because different contexts use different
+// removal strategies:
+//   - BattleService: removes by slot index
+//   - InventoryScreen: removes by consumable-list index mapping
 type ItemService struct {
-	player *domain.Player
+	// No dependencies — pure item-effect logic.
+	// Could accept a logger in the future for analytics.
 }
 
-// NewItemService creates an ItemService bound to the given player.
-func NewItemService(player *domain.Player) *ItemService {
-	return &ItemService{
-		player: player,
-	}
+// NewItemService creates item service.
+// No dependencies needed — this is a pure logic service.
+func NewItemService() *ItemService {
+	return &ItemService{} // No fields to initialize
 }
 
-// UseConsumable validates and applies a consumable item's effect to the player.
-//
-// Returns a UseResult indicating success/failure and a descriptive message.
-// The caller is responsible for removing the item from inventory only if
-// result.Success is true.
-//
-// Supported consumable types:
-//   - ConsumeHeal: Restores HP by item.Value. Fails if HP is already full.
-//   - ConsumeFullRestore: Restores HP to maximum. Fails if HP is already full.
-//   - ConsumeBuffAtk: Adds an attack buff for item.Duration turns.
-//   - ConsumeBuffDef: Adds a defense buff for item.Duration turns.
-func (s *ItemService) UseConsumable(item *domain.Item) UseResult {
-	// Guard: only consumables can be used
+// UseConsumable processes a consumable item's effect on the player.
+// Dispatches to specific handlers based on ConsumableType.
+// Each handler performs validation and effect application.
+// Returns UseResult for UI feedback — does NOT modify inventory.
+func (is *ItemService) UseConsumable(player *domain.Player, item *domain.Item) UseResult {
+	// Guard: verify the item is actually a consumable
 	if item.Category != domain.ItemConsumable {
 		return UseResult{
 			Success: false,
-			Error:   "This item cannot be used.",
+			Error:   "This item cannot be used.", // Non-consumable items (materials) can't be used
 		}
 	}
 
+	// Dispatch to the appropriate handler based on consumable type
 	switch item.ConsumableType {
 	case domain.ConsumeHeal:
-		return s.applyHeal(item)
+		return is.applyHeal(player, item) // Heal by item.Value HP
 
 	case domain.ConsumeFullRestore:
-		return s.applyFullRestore(item)
+		return is.applyFullRestore(player) // Restore to MaxHP
 
 	case domain.ConsumeBuffAtk:
-		return s.applyBuff(item, domain.BuffAttack, "ATK")
+		return is.applyBuff(player, domain.BuffAttack, item) // ATK buff
 
 	case domain.ConsumeBuffDef:
-		return s.applyBuff(item, domain.BuffDefense, "DEF")
+		return is.applyBuff(player, domain.BuffDefense, item) // DEF buff
 
 	default:
+		// ConsumeNone or any future unhandled type
 		return UseResult{
 			Success: false,
-			Error:   fmt.Sprintf("Unknown consumable type for %s.", item.Name),
+			Error:   "This item cannot be used.", // No effect handler defined
 		}
 	}
 }
 
-// applyHeal restores HP by item.Value, capped at MaxHP.
-// Fails with a descriptive error if player HP is already at maximum.
-func (s *ItemService) applyHeal(item *domain.Item) UseResult {
-	// Validate: prevent wasting a potion when HP is already full
-	if s.player.CurrentHP >= s.player.MaxHP {
+// applyHeal processes healing items (Small/Medium/Large Potion).
+// Validates that the player isn't already at full HP before healing.
+// Heal amount is capped at MaxHP by the player's Heal() method.
+func (is *ItemService) applyHeal(player *domain.Player, item *domain.Item) UseResult {
+	// Pre-condition check: healing at full HP is wasteful
+	if player.CurrentHP >= player.MaxHP {
 		return UseResult{
 			Success: false,
-			Error:   "HP is already full!",
+			Error:   "HP is already full!", // Inform UI that item was not consumed
 		}
 	}
 
-	// Record HP before healing to calculate actual amount recovered
-	oldHP := s.player.CurrentHP
+	// Record HP before healing for accurate "healed X HP" message
+	oldHP := player.CurrentHP
+	player.Heal(item.Value) // Apply healing (capped at MaxHP internally)
 
-	// Delegate to domain method which handles MaxHP capping
-	s.player.Heal(item.Value)
-
-	recovered := s.player.CurrentHP - oldHP
+	// Calculate actual HP restored (may be less than item.Value if near max)
+	healed := player.CurrentHP - oldHP
 
 	return UseResult{
 		Success: true,
-		Message: fmt.Sprintf("Used %s! Recovered %d HP.", item.Name, recovered),
+		Message: fmt.Sprintf("Used %s! Healed %d HP. (HP: %d/%d)",
+			item.Name, healed, player.CurrentHP, player.MaxHP),
 	}
 }
 
-// applyFullRestore sets HP to MaxHP.
-// Fails if player HP is already at maximum.
-func (s *ItemService) applyFullRestore(item *domain.Item) UseResult {
-	if s.player.CurrentHP >= s.player.MaxHP {
+// applyFullRestore processes Full Restore items.
+// Restores HP to maximum. Validates that HP isn't already full.
+func (is *ItemService) applyFullRestore(player *domain.Player) UseResult {
+	// Pre-condition check: same as regular heal
+	if player.CurrentHP >= player.MaxHP {
 		return UseResult{
 			Success: false,
-			Error:   "HP is already full!",
+			Error:   "HP is already full!", // Item not consumed
 		}
 	}
 
-	s.player.CurrentHP = s.player.MaxHP
+	// Calculate healing amount for message before modifying state
+	healed := player.MaxHP - player.CurrentHP
+	player.CurrentHP = player.MaxHP // Set HP directly to maximum
 
 	return UseResult{
 		Success: true,
-		Message: fmt.Sprintf("Used %s! Fully restored!", item.Name),
+		Message: fmt.Sprintf("Full Restore! Healed %d HP. (HP: %d/%d)",
+			healed, player.CurrentHP, player.MaxHP),
 	}
 }
 
-// applyBuff adds a temporary stat buff to the player.
-// buffLabel is used for the message (e.g., "ATK", "DEF").
-func (s *ItemService) applyBuff(item *domain.Item, buffType domain.BuffType, buffLabel string) UseResult {
-	s.player.AddBuff(buffType, item.Value, item.Duration)
+// applyBuff processes buff items (Attack/Defense Elixirs, Power Surge, Iron Skin).
+// Buffs stack multiplicatively with existing buffs of the same type.
+// Duration and value are taken from the item's Duration and Value fields.
+func (is *ItemService) applyBuff(player *domain.Player, buffType domain.BuffType, item *domain.Item) UseResult {
+	// Add the buff to the player's active buff list
+	// Multiple buffs of the same type can coexist (stacking)
+	player.AddBuff(buffType, item.Value, item.Duration)
+
+	// Build type-specific message text
+	var typeName string
+	switch buffType {
+	case domain.BuffAttack:
+		typeName = "ATK" // Display abbreviation for attack
+	case domain.BuffDefense:
+		typeName = "DEF" // Display abbreviation for defense
+	default:
+		typeName = "STAT" // Fallback — shouldn't occur in practice
+	}
 
 	return UseResult{
 		Success: true,
-		Message: fmt.Sprintf("Used %s! %s +%d%% for %d turns.", item.Name, buffLabel, item.Value, item.Duration),
+		Message: fmt.Sprintf("Used %s! %s +%d%% for %d turns.",
+			item.Name, typeName, item.Value, item.Duration),
 	}
 }

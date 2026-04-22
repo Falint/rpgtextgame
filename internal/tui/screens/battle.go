@@ -1,4 +1,6 @@
-// Package screens provides game screen implementations for Block 3.
+// battle.go implements the turn-based combat screen.
+// Renders enemy status, combat log, and action menu (Attack/Item/Run).
+// Delegates all combat logic to BattleService.
 package screens
 
 import (

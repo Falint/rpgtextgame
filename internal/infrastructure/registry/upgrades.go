@@ -1,36 +1,39 @@
-// Package registry provides data registries for game entities.
-// All data here EXACTLY matches C src/data/*.c files.
+// Package registry provides read-only data registries for game entities.
+// All data definitions EXACTLY match C src/data/*.c files for parity.
 package registry
 
-// UpgradeMaterial represents a required material for upgrade.
-// EXACT MATCH: C src/data/upgrades.h MaterialRequirement struct
+// UpgradeMaterial represents a single material requirement for a weapon upgrade.
+// Each upgrade recipe requires one or more materials in specific quantities.
 type UpgradeMaterial struct {
-	ItemID   string
-	Quantity int
+	ItemID   string // Item registry ID of the required material (e.g., "goblin_fang")
+	Quantity int    // Number of units needed for this upgrade step
 }
 
-// UpgradeRecipe defines how to upgrade a weapon.
-// EXACT MATCH: C src/data/upgrades.h UpgradeRecipe struct
+// UpgradeRecipe defines the full requirements to upgrade a weapon by one tier.
+// Each recipe specifies the source tier, target tier, gold cost, required
+// materials, and the base damage bonus gained from the upgrade.
 type UpgradeRecipe struct {
-	WeaponID    string
-	FromTier    int
-	ToTier      int
-	GoldCost    int
-	Materials   []UpgradeMaterial
-	DamageBonus int
+	WeaponID    string            // Weapon ID this recipe applies to
+	FromTier    int               // Current tier required (e.g., 1 for first upgrade)
+	ToTier      int               // Resulting tier after upgrade (FromTier + 1)
+	GoldCost    int               // Gold required to perform the upgrade
+	Materials   []UpgradeMaterial // List of materials and quantities needed
+	DamageBonus int               // Base damage increase applied on upgrade
 }
 
-// UpgradeRegistry holds all upgrade recipes.
+// UpgradeRegistry is the read-only data store for all weapon upgrade recipes.
+// Recipes are indexed by weapon ID for O(1) lookup during upgrade operations.
 type UpgradeRegistry struct {
-	recipes map[string][]UpgradeRecipe // keyed by weapon_id
+	recipes map[string][]UpgradeRecipe // All recipes grouped by weapon ID
 }
 
-// NewUpgradeRegistry creates registry with all upgrades from C upgrades.c.
+// NewUpgradeRegistry creates and initializes the upgrade registry.
+// Loads all 24 upgrade recipes (6 weapons × 4 tier transitions each).
 func NewUpgradeRegistry() *UpgradeRegistry {
 	r := &UpgradeRegistry{
-		recipes: make(map[string][]UpgradeRecipe),
+		recipes: make(map[string][]UpgradeRecipe), // Initialize recipe lookup map
 	}
-	r.loadRecipes()
+	r.loadRecipes() // Populate all upgrade paths from hardcoded data
 	return r
 }
 
@@ -231,37 +234,42 @@ func (r *UpgradeRegistry) loadRecipes() {
 		},
 	}
 
-	// Index by weapon_id
+	// Build index: group all recipes by their weapon ID for efficient lookup
 	for _, recipe := range recipes {
 		r.recipes[recipe.WeaponID] = append(r.recipes[recipe.WeaponID], recipe)
 	}
 }
 
-// GetRecipe returns upgrade recipe for a weapon at given tier.
+// GetRecipe returns the upgrade recipe for a specific weapon at a specific tier.
+// Used by UpgradeScreen to check requirements and perform upgrades.
+// Returns nil if no recipe exists for the given weapon/tier combination.
 func (r *UpgradeRegistry) GetRecipe(weaponID string, fromTier int) *UpgradeRecipe {
-	recipes, ok := r.recipes[weaponID]
+	recipes, ok := r.recipes[weaponID] // Lookup all recipes for this weapon
 	if !ok {
-		return nil
+		return nil // No upgrade path exists for this weapon
 	}
 
+	// Linear search for the specific tier transition
 	for i := range recipes {
 		if recipes[i].FromTier == fromTier {
-			return &recipes[i]
+			return &recipes[i] // Return pointer to matching recipe
 		}
 	}
-	return nil
+	return nil // No recipe for this tier (weapon may be at max tier)
 }
 
-// GetAllRecipesForWeapon returns all upgrade paths for a weapon.
+// GetAllRecipesForWeapon returns the full upgrade path for a weapon.
+// Returns recipes for all tier transitions (e.g., 1→2, 2→3, 3→4, 4→5).
 func (r *UpgradeRegistry) GetAllRecipesForWeapon(weaponID string) []UpgradeRecipe {
-	return r.recipes[weaponID]
+	return r.recipes[weaponID] // Returns nil slice if weapon has no upgrades
 }
 
-// GetUpgradeableWeaponIDs returns list of weapons that have upgrade paths.
+// GetUpgradeableWeaponIDs returns all weapon IDs that have at least one upgrade recipe.
+// Used by UpgradeScreen to determine which weapons can potentially be upgraded.
 func (r *UpgradeRegistry) GetUpgradeableWeaponIDs() []string {
-	result := make([]string, 0, len(r.recipes))
+	result := make([]string, 0, len(r.recipes)) // Pre-allocate with known capacity
 	for id := range r.recipes {
-		result = append(result, id)
+		result = append(result, id) // Collect all weapon IDs with upgrade paths
 	}
 	return result
 }

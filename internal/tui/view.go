@@ -1,11 +1,17 @@
+// view.go implements the View function of the Elm Architecture.
+// Renders the 3-panel layout: Menu | Character | Game Screen.
+// Panel widths follow the 12-column grid defined in constants.go.
+// The status bar at the bottom shows contextual controls.
 package tui
 
 import (
-	"github.com/charmbracelet/lipgloss"
-	"github.com/tenyom/textrpg-tui/internal/tui/styles"
+	"github.com/charmbracelet/lipgloss"                 // Terminal layout: joining panels horizontally
+	"github.com/tenyom/textrpg-tui/internal/tui/styles" // Centralized style definitions
 )
 
-// View renders the application UI.
+// View renders the complete terminal UI.
+// Returns a single string containing all panels, header, and status bar.
+// BubbleTea calls this after each Update to refresh the display.
 func (m AppModel) View() string {
 	if m.width == 0 {
 		return "Initializing UI..."

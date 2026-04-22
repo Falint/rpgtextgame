@@ -1,4 +1,6 @@
-// Package screens provides game screen implementations for Block 3.
+// upgrade.go implements the weapon upgrade screen.
+// Shows available upgrade recipes with material requirements, gold costs,
+// and damage bonuses. Validates requirements before applying upgrades.
 package screens
 
 import (

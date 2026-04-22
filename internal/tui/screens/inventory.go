@@ -1,4 +1,6 @@
-// Package screens provides game screen implementations for Block 3.
+// inventory.go implements the inventory management screen.
+// Shows items/weapons in tabbed view (All/Consumables/Weapons/Materials).
+// Allows using consumable items via the shared ItemService.
 package screens
 
 import (

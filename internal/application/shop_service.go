@@ -1,127 +1,145 @@
 package application
 
 import (
-	"github.com/tenyom/textrpg-tui/internal/domain"
-	"github.com/tenyom/textrpg-tui/internal/infrastructure/registry"
+	"github.com/tenyom/textrpg-tui/internal/domain"                  // Domain entities and result codes
+	"github.com/tenyom/textrpg-tui/internal/infrastructure/registry" // Weapon and Item registries
 )
 
-// DefaultSellRatio is the fraction of base sell price the player receives.
+// DefaultSellRatio determines what fraction of buy price a player receives when selling.
+// 0.5 means players get 50% of the weapon's buy price back.
+// Applied to weapon sales; items use their dedicated SellPrice field.
 const DefaultSellRatio = 0.5
 
-// ShopService handles buying and selling.
+// ShopService manages buy/sell transactions between player and shop.
+// Validates gold, inventory capacity, and performs atomic transactions.
 type ShopService struct {
-	player    *domain.Player
-	weapons   *registry.WeaponRegistry
-	items     *registry.ItemRegistry
-	sellRatio float64
+	player         *domain.Player           // Mutable player reference for gold and inventory
+	weaponRegistry *registry.WeaponRegistry // Read-only weapon data source
+	itemRegistry   *registry.ItemRegistry   // Read-only item data source
+	sellRatio      float64                  // Sell price multiplier (default 0.5)
 }
 
-// NewShopService creates a shop service.
-func NewShopService(player *domain.Player, weapons *registry.WeaponRegistry, items *registry.ItemRegistry) *ShopService {
+// NewShopService creates shop service with injected dependencies.
+// Uses DefaultSellRatio (0.5) for consistent sell pricing.
+func NewShopService(
+	player *domain.Player,
+	weaponReg *registry.WeaponRegistry,
+	itemReg *registry.ItemRegistry,
+) *ShopService {
 	return &ShopService{
-		player:    player,
-		weapons:   weapons,
-		items:     items,
-		sellRatio: DefaultSellRatio,
+		player:         player,           // Store player reference
+		weaponRegistry: weaponReg,        // Store weapon data source
+		itemRegistry:   itemReg,          // Store item data source
+		sellRatio:      DefaultSellRatio, // 0.5 — player gets half the buy price when selling weapons
 	}
 }
 
-// GetShopWeapons returns weapons available for purchase with stock info.
-func (s *ShopService) GetShopWeapons() []registry.ShopWeaponEntry {
-	return s.weapons.GetShopWeapons()
-}
-
-// GetShopItems returns items available for purchase with stock info.
-func (s *ShopService) GetShopItems() []registry.ShopItemEntry {
-	return s.items.GetShopItems()
-}
-
-// BuyWeapon purchases a weapon.
-func (s *ShopService) BuyWeapon(weaponID string) domain.ResultCode {
-	template := s.weapons.GetByID(weaponID)
+// BuyWeapon purchases a weapon from the shop.
+// Validates: weapon exists, player has enough gold, inventory has room.
+// Transaction: gold deducted → weapon created from template → added to inventory.
+func (ss *ShopService) BuyWeapon(weaponID string) domain.ResultCode {
+	// Step 1: Lookup weapon template in registry
+	template := ss.weaponRegistry.GetByID(weaponID)
 	if template == nil {
-		return domain.ResultItemNotFound
+		return domain.ResultItemNotFound // Weapon ID doesn't exist in registry
 	}
 
-	if s.player.Gold < template.BuyPrice {
-		return domain.ResultNotEnoughGold
+	// Step 2: Validate gold sufficiency
+	if ss.player.Gold < template.BuyPrice {
+		return domain.ResultNotEnoughGold // Player can't afford this weapon
 	}
 
-	weapon := template.ToWeapon()
-	result := s.player.Inventory.AddWeapon(weapon)
+	// Step 3: Create mutable weapon instance from immutable template
+	weapon := template.ToWeapon() // Copies template data into a new Weapon
+
+	// Step 4: Try to add weapon to inventory (may fail if full)
+	result := ss.player.Inventory.AddWeapon(weapon)
 	if result != domain.ResultSuccess {
-		return result
+		return result // Forward inventory error (ResultInventoryFull)
 	}
 
-	s.player.Gold -= template.BuyPrice
-	return domain.ResultSuccess
+	// Step 5: Deduct gold — only after successful inventory addition
+	// This ordering ensures no gold is lost if inventory is full.
+	ss.player.Gold -= template.BuyPrice
+
+	return domain.ResultSuccess // Transaction complete
 }
 
-// BuyItem purchases an item.
-func (s *ShopService) BuyItem(itemID string, quantity int) domain.ResultCode {
-	template := s.items.GetByID(itemID)
+// BuyItem purchases an item from the shop.
+// Similar flow to BuyWeapon but creates an Item from ItemTemplate.
+// Items are stackable — AddItem handles stacking with existing stacks.
+func (ss *ShopService) BuyItem(itemID string) domain.ResultCode {
+	// Step 1: Lookup item template in registry
+	template := ss.itemRegistry.GetByID(itemID)
 	if template == nil {
-		return domain.ResultItemNotFound
+		return domain.ResultItemNotFound // Item ID doesn't exist in registry
 	}
 
-	totalCost := template.BuyPrice * quantity
-	if s.player.Gold < totalCost {
-		return domain.ResultNotEnoughGold
+	// Step 2: Validate gold sufficiency
+	if ss.player.Gold < template.BuyPrice {
+		return domain.ResultNotEnoughGold // Player can't afford this item
 	}
 
-	item := &domain.Item{
-		ID:             template.ID,
-		Name:           template.Name,
-		Description:    template.Description,
-		Category:       domain.ItemCategory(template.Category),
-		ConsumableType: domain.ConsumableType(template.ConsumableType),
-		Value:          template.Value,
-		Duration:       template.Duration,
-		BuyPrice:       template.BuyPrice,
-		SellPrice:      template.SellPrice,
-		Stackable:      template.Stackable,
-	}
+	// Step 3: Create mutable item instance from immutable template
+	item := template.ToItem() // Copies template data into a new Item
 
-	result := s.player.Inventory.AddItem(item, quantity)
+	// Step 4: Try to add item to inventory (1 unit)
+	// AddItem handles stacking with existing same-ID items automatically
+	result := ss.player.Inventory.AddItem(item, 1)
 	if result != domain.ResultSuccess {
-		return result
+		return result // Forward inventory error (ResultInventoryFull)
 	}
 
-	s.player.Gold -= totalCost
-	return domain.ResultSuccess
+	// Step 5: Deduct gold — only after successful inventory addition
+	ss.player.Gold -= template.BuyPrice
+
+	return domain.ResultSuccess // Transaction complete
 }
 
-// SellItem sells items from inventory.
-func (s *ShopService) SellItem(slotIndex int, quantity int) domain.ResultCode {
-	slot := s.player.Inventory.GetSlot(slotIndex)
+// SellItem sells an item from inventory.
+// Handles both weapons and items. Calculates sell price based on item type:
+//   - Weapons: template.BuyPrice * sellRatio (0.5)
+//   - Items: item.SellPrice (direct value from item definition)
+//
+// Returns the gold earned for UI display.
+func (ss *ShopService) SellItem(slotIndex int) (int, domain.ResultCode) {
+	// Step 1: Validate slot index bounds
+	slot := ss.player.Inventory.GetSlot(slotIndex)
 	if slot == nil || slot.Type == domain.SlotEmpty {
-		return domain.ResultInvalidSlot
+		return 0, domain.ResultInvalidSlot // Slot doesn't exist or is empty
 	}
 
-	var sellPrice int
-	if slot.Type == domain.SlotWeapon {
-		// Sell weapon
-		weapon := slot.Weapon
-		template := s.weapons.GetByID(weapon.ID)
+	// Step 2: Calculate sell price based on slot contents
+	var sellValue int
+	switch slot.Type {
+	case domain.SlotWeapon:
+		// Weapon sell price: look up buy price from template, apply sell ratio
+		template := ss.weaponRegistry.GetByID(slot.Weapon.ID)
 		if template != nil {
-			sellPrice = int(float64(template.SellPrice) * s.sellRatio)
+			sellValue = int(float64(template.BuyPrice) * ss.sellRatio) // 50% of buy price
 		}
-		s.player.Inventory.RemoveWeapon(slotIndex)
-	} else if slot.Type == domain.SlotItem {
-		// Sell items
-		item := slot.Item
-		if quantity > slot.Quantity {
-			quantity = slot.Quantity
-		}
-		sellPrice = item.SellPrice * quantity
-		s.player.Inventory.RemoveItem(slotIndex, quantity)
+	case domain.SlotItem:
+		// Item sell price: use the item's dedicated SellPrice field directly
+		sellValue = slot.Item.SellPrice
 	}
 
-	s.player.Gold += sellPrice
-	return domain.ResultSuccess
+	// Step 3: Remove from inventory (1 unit)
+	ss.player.Inventory.RemoveItem(slotIndex, 1)
+
+	// Step 4: Add gold to player balance
+	ss.player.AddGold(sellValue)
+
+	return sellValue, domain.ResultSuccess // Return gold earned for UI message
 }
 
-// GetPlayerGold returns player's current gold.
-func (s *ShopService) GetPlayerGold() int {
-	return s.player.Gold
+// GetShopWeapons returns available weapons from the weapon registry.
+// Delegates entirely to WeaponRegistry.GetShopWeapons().
+func (ss *ShopService) GetShopWeapons() []registry.WeaponTemplate {
+	return ss.weaponRegistry.GetShopWeapons()
+}
+
+// GetShopItems returns available items from the item registry.
+// Delegates entirely to ItemRegistry.GetShopItems().
+func (ss *ShopService) GetShopItems() []registry.ItemTemplate {
+	return ss.itemRegistry.GetShopItems()
 }

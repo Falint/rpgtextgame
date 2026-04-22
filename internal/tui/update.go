@@ -1,13 +1,24 @@
+// update.go implements the Update function of the Elm Architecture.
+// This is the central message dispatcher for the TUI application.
+// It processes keyboard input, window resize events, and screen
+// lifecycle messages, coordinating between the menu, character panel,
+// and the active game screen.
 package tui
 
 import (
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/tenyom/textrpg-tui/internal/domain"
-	"github.com/tenyom/textrpg-tui/internal/tui/components"
-	"github.com/tenyom/textrpg-tui/internal/tui/screens"
+	tea "github.com/charmbracelet/bubbletea"                // BubbleTea framework types
+	"github.com/tenyom/textrpg-tui/internal/domain"         // MonsterType for battle selection
+	"github.com/tenyom/textrpg-tui/internal/tui/components" // Menu component and menu item IDs
+	"github.com/tenyom/textrpg-tui/internal/tui/screens"    // Screen factory functions and messages
 )
 
-// Update handles incoming messages and events.
+// Update handles all incoming BubbleTea messages.
+// Message processing order:
+//  1. Global keys (Ctrl+C to quit)
+//  2. Window resize events
+//  3. Screen lifecycle messages (EndScreenMsg)
+//  4. Active screen input forwarding
+//  5. Menu navigation and selection
 func (m AppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	var cmds []tea.Cmd

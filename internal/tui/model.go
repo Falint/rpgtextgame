@@ -1,4 +1,11 @@
-// Package tui provides the BubbleTea-based terminal UI.
+// Package tui implements the terminal user interface using BubbleTea.
+// This is the presentation layer of the Clean Architecture, depending on
+// all other layers (domain, application, infrastructure) via injection.
+//
+// ARCHITECTURE: Elm Architecture (Model-Update-View)
+// - Model (AppModel): holds all application state
+// - Update: processes messages, returns updated model + commands
+// - View: renders model state to terminal string
 package tui
 
 import (
