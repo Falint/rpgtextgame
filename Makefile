@@ -1,5 +1,5 @@
 CXX      := g++
-CXXFLAGS := -std=c++17 -Wall -Wextra -O2 -Isrc
+CXXFLAGS := -std=c++17 -Wall -Wextra -O2 -Isrc -MMD -MP
 TARGET   := textrpg.exe
 
 SRCS := \
@@ -22,6 +22,7 @@ SRCS := \
   src/tui/app.cpp
 
 OBJS := $(SRCS:.cpp=.o)
+DEPS := $(OBJS:.o=.d)
 
 all: $(TARGET)
 
@@ -32,6 +33,8 @@ $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 clean:
-	del /Q $(subst /,\,$(OBJS)) $(TARGET) 2>nul || true
+	del /Q $(subst /,\,$(OBJS)) $(subst /,\,$(DEPS)) $(TARGET) 2>nul || true
+
+-include $(DEPS)
 
 .PHONY: all clean

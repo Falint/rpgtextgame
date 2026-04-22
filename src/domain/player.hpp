@@ -21,13 +21,13 @@ static constexpr int    MIN_DAMAGE              = 1;
 
 struct PlayerConfig {
     int startingHP   = 100;
-    int startingGold = 150;
-    int baseDef      = 5;
+    int startingGold = 300;
+    int baseDef      = 10;
     int maxBuffs     = 3;
 };
 
 inline PlayerConfig defaultPlayerConfig() {
-    return PlayerConfig{100, 150, 5, 3};
+    return PlayerConfig{100, 300, 10, 3};
 }
 
 // ─── Player ──────────────────────────────────────────────────────────────────

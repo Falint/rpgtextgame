@@ -20,8 +20,8 @@
  * PLAYER DEFAULTS
  * ============================================ */
 #define PLAYER_STARTING_HP      100
-#define PLAYER_STARTING_GOLD    150
-#define PLAYER_STARTING_DEF     5
+#define PLAYER_STARTING_GOLD    300
+#define PLAYER_STARTING_DEF     10
 
 /* ============================================
  * INVENTORY

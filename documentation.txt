@@ -192,7 +192,7 @@ enabling testability and clear ownership.
 STARTUP SEQUENCE (main.go):
   1. Create all four registries (monsters, weapons, items, upgrades).
      These are read-only data stores populated at initialization.
-  2. Create a new Player with default configuration (100 HP, 150 Gold, 5 DEF).
+  2. Create a new Player with default configuration (100 HP, 300 Gold, 10 DEF).
   3. Give starting equipment: 3x Small Potion + Iron Sword (equipped).
   4. Create application services (ItemService, BattleService, ShopService).
      ItemService is shared between BattleService and InventoryScreen.
@@ -378,7 +378,7 @@ DEPENDENCIES: domain constants
 
   CONSTRUCTOR:
     NewPlayer(name, config) creates player with configurable starting stats.
-    DefaultPlayerConfig() returns: 100 HP, 150 Gold, 5 DEF.
+    DefaultPlayerConfig() returns: 100 HP, 300 Gold, 10 DEF.
 
   KEY METHODS:
     GetAttack()   → BaseAttack + weapon damage + buff bonuses (percentage)

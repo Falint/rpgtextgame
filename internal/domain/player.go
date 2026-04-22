@@ -63,12 +63,12 @@ type PlayerConfig struct {
 }
 
 // DefaultPlayerConfig returns sensible defaults matching the C version.
-// 100 HP, 150 Gold, 5 DEF, up to 3 concurrent buffs.
+// 100 HP, 300 Gold, 10 DEF, up to 3 concurrent buffs.
 func DefaultPlayerConfig() PlayerConfig {
 	return PlayerConfig{
 		StartingHP:   100, // Matches C PLAYER_DEFAULT_HP
-		StartingGold: 150, // Matches C PLAYER_DEFAULT_GOLD
-		BaseDef:      5,   // Matches C PLAYER_DEFAULT_DEF
+		StartingGold: 300, // Matches C PLAYER_DEFAULT_GOLD
+		BaseDef:      10,  // Matches C PLAYER_DEFAULT_DEF
 		MaxBuffs:     3,   // Pre-allocates buff slice capacity
 	}
 }
@@ -82,8 +82,8 @@ func NewPlayer(name string, cfg PlayerConfig) *Player {
 		MaxHP:      cfg.StartingHP,                  // Set both max and current HP to starting value
 		CurrentHP:  cfg.StartingHP,                  // Player starts at full health
 		BaseAttack: DefaultBaseAttack,               // 10 — matches C constant
-		BaseDef:    cfg.BaseDef,                     // 5 — from config
-		Gold:       cfg.StartingGold,                // 150 — from config
+		BaseDef:    cfg.BaseDef,                     // 10 — from config
+		Gold:       cfg.StartingGold,                // 300 — from config
 		Inventory:  NewInventory(MaxInventorySlots), // Create 20-slot inventory
 		Buffs:      make([]Buff, 0, cfg.MaxBuffs),   // Pre-allocate buff slice
 	}

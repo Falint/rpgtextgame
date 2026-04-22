@@ -27,8 +27,8 @@ namespace GameConfig {
      * ============================================ */
     namespace Player {
         constexpr int32_t STARTING_HP    = 100;
-        constexpr int32_t STARTING_GOLD  = 150;
-        constexpr int32_t STARTING_DEF   = 5;
+        constexpr int32_t STARTING_GOLD  = 300;
+        constexpr int32_t STARTING_DEF   = 10;
     }
 
     /* ============================================
