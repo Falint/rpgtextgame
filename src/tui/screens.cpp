@@ -3,25 +3,11 @@
 #include <algorithm>
 #include <string>
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-static std::string sec(const std::string& s) {
-    return std::string(CLR_ACCENT) + ANSI_BOLD + s + ANSI_RESET;
-}
-static std::string sep(const std::string& s) {
-    return std::string(CLR_SECONDARY) + s + ANSI_RESET;
-}
-
 // ═══════════════════════════════════════════════════════════════════════════════
 // BattleScreen
 // ═══════════════════════════════════════════════════════════════════════════════
 BattleScreen::BattleScreen(BattleService* svc, Player* player)
     : svc_(svc), player_(player) {}
-
-void BattleScreen::clamp(int& cur, int max) {
-    if (max <= 0) { cur = 0; return; }
-    if (cur < 0)    cur = 0;
-    if (cur >= max) cur = max - 1;
-}
 
 bool BattleScreen::update(Key key, char ch) {
     if (mode_ == Mode::Result) {
@@ -32,7 +18,7 @@ bool BattleScreen::update(Key key, char ch) {
     }
     switch (key) {
     case Key::Up:   case Key::Char: if (ch=='k'||key==Key::Up) { if(cursor_>0)--cursor_; } break;
-    case Key::Down: ++cursor_; clamp(cursor_, mode_==Mode::Main ? 3 : (int)player_->inventory->getConsumables().size()); break;
+    case Key::Down: ++cursor_; tui::clamp(cursor_, mode_==Mode::Main ? 3 : (int)player_->inventory->getConsumables().size()); break;
     case Key::Enter: handleSelect(); break;
     case Key::Escape:
         if (mode_ == Mode::ItemSelect) { mode_ = Mode::Main; cursor_ = 0; }
@@ -62,7 +48,7 @@ void BattleScreen::handleSelect() {
 void BattleScreen::handleUseItem() {
     auto cons = player_->inventory->getConsumables();
     if (cons.empty()) { mode_ = Mode::Main; return; }
-    clamp(cursor_, (int)cons.size());
+    tui::clamp(cursor_, (int)cons.size());
     int slotIdx = findConsumableSlot(cursor_);
     if (slotIdx != -1) {
         svc_->useItem(slotIdx);
@@ -86,7 +72,7 @@ int BattleScreen::findConsumableSlot(int n) const {
 
 std::string BattleScreen::render() const {
     std::string out;
-    out += sec("=== BATTLE! ===") + "\n\n";
+    out += tui::header("=== BATTLE! ===") + "\n\n";
 
     auto* e = svc_->getEnemy();
     if (!e) return "No active battle.\n";
@@ -104,7 +90,7 @@ std::string BattleScreen::render() const {
     out += Terminal::hpColor(e->currentHP, e->maxHP, hpStr);
     if (e->element != Element::None)
         out += std::string("  [") + elementStr(e->element) + "]";
-    out += "\n" + sep(std::string(30, '-')) + "\n";
+    out += "\n" + tui::dim(std::string(30, '-')) + "\n";
 
     // Log (last 8 entries)
     auto& logs = svc_->getLogs();
@@ -124,7 +110,7 @@ std::string BattleScreen::render() const {
         else
             out += Terminal::muted("ESCAPED!") + "\nPress [Enter] to continue...";
     } else if (mode_ == Mode::ItemSelect) {
-        out += sep("--- Select Item ---") + "\n";
+        out += tui::dim("--- Select Item ---") + "\n";
         auto cons = player_->inventory->getConsumables();
         if (cons.empty()) {
             out += Terminal::muted("  No items!") + "\n" + Terminal::muted("[Esc] Back");
@@ -137,7 +123,7 @@ std::string BattleScreen::render() const {
             out += "\n" + Terminal::muted("[Enter] Use  [Esc] Back");
         }
     } else {
-        out += sep("--- Actions ---") + "\n";
+        out += tui::dim("--- Actions ---") + "\n";
         const char* acts[] = {"1. Attack","2. Use Item","3. Run"};
         for (int i = 0; i < 3; ++i)
             out += (i == cursor_ ? Terminal::selected(acts[i]) : Terminal::normal(acts[i])) + "\n";

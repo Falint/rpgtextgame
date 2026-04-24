@@ -3,26 +3,11 @@
 #include <sstream>
 #include <algorithm>
 
-static std::string sec2(const std::string& s) { return std::string(CLR_ACCENT)+ANSI_BOLD+s+ANSI_RESET; }
-static std::string sep2(const std::string& s) { return std::string(CLR_SECONDARY)+s+ANSI_RESET; }
-
-// Helper: clamp without modifying state (use local copy)
-static int clamped(int v, int mx) {
-    if (mx <= 0) return 0;
-    if (v < 0)   return 0;
-    if (v >= mx) return mx - 1;
-    return v;
-}
-
 // ═══════════════════════════════════════════════════════════════════════════════
 // ShopScreen
 // ═══════════════════════════════════════════════════════════════════════════════
 ShopScreen::ShopScreen(ShopService* svc, WeaponRegistry* w, ItemRegistry* it, Player* p)
     : svc_(svc), weapons_(w), items_(it), player_(p) {}
-
-void ShopScreen::clamp(int& c, int mx) {
-    if (mx<=0){c=0;return;} if(c<0)c=0; if(c>=mx)c=mx-1;
-}
 
 bool ShopScreen::update(Key key, char ch) {
     if (key==Key::Up   ||(key==Key::Char&&ch=='k')) { if(cursor_>0)--cursor_; return true; }
@@ -56,7 +41,7 @@ void ShopScreen::handleSelect() {
 
 void ShopScreen::handleBuyWeapon() {
     auto entries = svc_->getShopWeapons();
-    clamp(cursor_,(int)entries.size());
+    tui::clamp(cursor_,(int)entries.size());
     if (cursor_<0||cursor_>=(int)entries.size()) return;
     auto& e = entries[cursor_];
     if (e.isSoldOut()) { msg_="SOLD OUT!"; msgStyle_="error"; return; }
@@ -69,7 +54,7 @@ void ShopScreen::handleBuyWeapon() {
 
 void ShopScreen::handleBuyItem() {
     auto entries = svc_->getShopItems();
-    clamp(cursor_,(int)entries.size());
+    tui::clamp(cursor_,(int)entries.size());
     if (cursor_<0||cursor_>=(int)entries.size()) return;
     auto& e = entries[cursor_];
     if (e.isSoldOut()) { msg_="SOLD OUT!"; msgStyle_="error"; return; }
@@ -82,7 +67,7 @@ void ShopScreen::handleBuyItem() {
 
 void ShopScreen::handleSell() {
     auto slots = player_->inventory->getOccupiedSlots();
-    clamp(cursor_,(int)slots.size());
+    tui::clamp(cursor_,(int)slots.size());
     if (cursor_<0||cursor_>=(int)slots.size()) return;
     auto result = svc_->sellItem(slots[cursor_]);
     int goldEarned = result.first;
@@ -93,21 +78,21 @@ void ShopScreen::handleSell() {
 
 std::string ShopScreen::render() const {
     std::string out;
-    out += sec2("=== SHOP ===") + "\n\n";
+    out += tui::header("=== SHOP ===") + "\n\n";
     out += std::string(CLR_DIM)+"Your Gold: "+ANSI_RESET
          + Terminal::gold(std::to_string(player_->gold)+" G") + "\n";
 
     if (mode_==Mode::Main) {
-        out += "\n" + sep2("--- Shop Menu ---") + "\n";
+        out += "\n" + tui::dim("--- Shop Menu ---") + "\n";
         const char* opts[]={"1. Buy Weapons","2. Buy Items","3. Sell Items","4. Exit Shop"};
         for (int i=0; i<4; ++i)
             out += (i==cursor_ ? Terminal::selected(opts[i]) : Terminal::normal(opts[i])) + "\n";
         out += "Choice: ";
 
     } else if (mode_==Mode::BuyWeapons) {
-        out += "\n" + sec2("=== WEAPONS ===") + "\n\n";
+        out += "\n" + tui::header("=== WEAPONS ===") + "\n\n";
         auto entries = svc_->getShopWeapons();
-        int cur = clamped(cursor_, (int)entries.size());
+        int cur = tui::clamped(cursor_, (int)entries.size());
         for (int i=0; i<(int)entries.size(); ++i) {
             auto& e = entries[i];
             std::string line = std::to_string(i+1)+". ";
@@ -136,9 +121,9 @@ std::string ShopScreen::render() const {
         out += "\n" + Terminal::muted("[Enter] Buy  [Esc] Back");
 
     } else if (mode_==Mode::BuyItems) {
-        out += "\n" + sec2("=== ITEMS ===") + "\n\n";
+        out += "\n" + tui::header("=== ITEMS ===") + "\n\n";
         auto entries = svc_->getShopItems();
-        int cur = clamped(cursor_, (int)entries.size());
+        int cur = tui::clamped(cursor_, (int)entries.size());
         for (int i=0; i<(int)entries.size(); ++i) {
             auto& e = entries[i];
             std::string line = std::to_string(i+1)+". ";
@@ -157,9 +142,9 @@ std::string ShopScreen::render() const {
         out += "\n" + Terminal::muted("[Enter] Buy  [Esc] Back");
 
     } else if (mode_==Mode::Sell) {
-        out += "\n" + sec2("=== SELL ITEMS ===") + "\n\n";
+        out += "\n" + tui::header("=== SELL ITEMS ===") + "\n\n";
         auto slots = player_->inventory->getOccupiedSlots();
-        int cur = clamped(cursor_, (int)slots.size());
+        int cur = tui::clamped(cursor_, (int)slots.size());
         if (slots.empty()) {
             out += Terminal::muted("  No items to sell");
         } else {

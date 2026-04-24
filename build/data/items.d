@@ -1,6 +1,8 @@
-build/data/items.o: src/data/items.c src/data/items.h src/data/registry.h \
- src/data/../types.h src/data/../config.h
-src/data/items.h:
-src/data/registry.h:
-src/data/../types.h:
-src/data/../config.h:
+build/data/items.o: src/data/items.cpp src/data/items.hpp \
+ src/data/../domain/inventory.hpp src/data/../domain/errors.hpp \
+ src/data/../domain/weapon.hpp src/data/../domain/element.hpp
+src/data/items.hpp:
+src/data/../domain/inventory.hpp:
+src/data/../domain/errors.hpp:
+src/data/../domain/weapon.hpp:
+src/data/../domain/element.hpp:
