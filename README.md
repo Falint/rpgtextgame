@@ -1,79 +1,143 @@
-# TextRPG
+# TextRPG (C++ Version)
 
-A professional, data-driven text-based RPG written in C99.
+A professional, modern, and clean text-based RPG written in C++17, featuring an interactive Terminal UI (TUI), cross-platform CMake build system, and Docker support for portable deployment.
+
+---
 
 ## Features
 
-- **Turn-Based Combat** with elemental strengths/weaknesses
-- **14 Monsters** across 3 tiers (Normal, Elite, Boss)
-- **19 Weapons** with elemental affinities
-- **Weapon Upgrade System** - upgrade weapons using materials dropped by monsters
-- **Buff System** - ATK/DEF potions with turn-based duration
-- **Shop System** - Buy weapons, potions, and sell loot
-- **Loot Drops** - Each monster has unique loot tables
+* **Terminal UI**: Fast, interactive menu-driven interface with ANSI color support
+* **Turn-Based Combat**: Engaging battle system with elemental strengths and weaknesses
+* **Weapon Upgrades**: Crafting and progression system using monster drops
+* **Modular Architecture**: Clear separation of Domain, Data, Game Services, and TUI layers
+* **Cross-Platform Build**: Native support for Windows and Linux using CMake
+* **Docker Support**: Run the project consistently across environments without manual dependency setup
 
-## Build
+---
+
+## System Architecture Flowchart
+
+```mermaid
+graph TD
+    A[Main Loop] --> B[App / Input Handling]
+    B -->|Navigation| C[Main Menu]
+    B -->|Active Screen| D[TUI Screens]
+
+    C -->|Select| E{Screen Types}
+    E -->|1| F[BattleScreen]
+    E -->|2| G[ShopScreen]
+    E -->|3| H[InventoryScreen]
+    E -->|4| I[UpgradeScreen]
+    E -->|5| J[StatusScreen]
+
+    D --> K[Renderer]
+    K -->|Draw| L[Terminal Output]
+```
+
+---
+
+## Build Instructions
+
+---
+
+### Native Build (CMake)
+
+Build locally using CMake:
 
 ```bash
-# Build the game
-make
-
-# Build and run
-make run
-
-# Clean build
-make rebuild
+cmake -B build -G "MinGW Makefiles"
+cmake --build build
 ```
 
-## Architecture
+Run the game:
 
-The codebase follows a professional **layered architecture**:
-
-```
-src/
-├── main.c           # Entry point
-├── types.h          # Type definitions
-├── config.h         # Game constants
-├── utils/           # Utility functions
-├── data/            # Data layer (Registry pattern)
-├── core/            # Core entities (Player, Enemy, Item, etc.)
-└── game/            # Game systems (Battle, Shop, Upgrade)
+```bash
+./build/textrpg
 ```
 
-### Data-Driven Design
+For Windows:
 
-All game content is defined in static databases:
-- `data/monsters.c` - Monster definitions
-- `data/weapons.c` - Weapon definitions  
-- `data/items.c` - Item definitions
-- `data/upgrades.c` - Upgrade recipes
-- `data/shop_stock.c` - Shop inventory
+```bash
+.\build\textrpg.exe
+```
 
-To add new content, simply edit the appropriate data file. No code changes required!
+---
 
-## How to Play
+## Quick Start
 
-1. **Battle** - Fight monsters to earn gold and materials
-2. **Shop** - Buy better weapons and potions
-3. **Upgrade** - Use materials to upgrade your weapons
-4. **Win** - Defeat the bosses!
+### For Windows Users
+Download textrpg.exe from Releases and run directly
 
-### Combat Tips
+### For Developers
+Use CMake native build
 
-- Use elemental advantages (Fire > Wind > Earth > Water > Fire)
-- Elite monsters drop rare materials for upgrades
-- Boss monsters cannot be escaped but give the best rewards
-- Use buff potions before tough fights
+### For Portable Deployment
+Use Docker
 
-## Controls
+### Docker Build
 
-All interactions are number-based menu selections. Simply type the number of your choice and press Enter.
+Build the Docker image:
+
+```bash
+docker build -t textrpg .
+```
+
+Run the game inside Docker:
+
+```bash
+docker run -it textrpg
+```
+
+This ensures the game runs consistently on any machine with Docker installed.
+
+---
 
 ## Requirements
 
-- GCC with C99 support
-- Make
+### Native Build
 
-## License
+* C++17 compatible compiler (`g++`, MinGW, GCC, or MSVC)
+* CMake 3.10+
+* Make (for MinGW/Linux builds)
 
-MIT License
+### Docker Build
+
+* Docker Desktop
+* WSL2 (recommended for Windows)
+
+---
+
+## Project Structure
+
+```text
+rpgtextgame/
+├── src/
+│   ├── data/
+│   ├── domain/
+│   ├── game/
+│   ├── tui/
+│   └── main.cpp
+│
+├── build/
+├── Dockerfile
+├── CMakeLists.txt
+├── .gitignore
+├── .dockerignore
+└── README.md
+```
+
+---
+
+## Development Notes
+
+This project was refactored from platform-specific Makefiles into a professional CMake-based cross-platform build system with Docker deployment support.
+
+This improves:
+
+* maintainability
+* portability
+* deployment consistency
+* recruiter-facing project quality
+* production-readiness
+
+---

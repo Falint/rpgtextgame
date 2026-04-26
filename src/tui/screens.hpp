@@ -9,6 +9,27 @@
 #include "../data/weapons.hpp"
 #include "../data/items.hpp"
 
+// ─── Shared UI Helpers ─────────────────────────────────────────────────────────
+namespace tui {
+    inline void clamp(int& cur, int max) {
+        if (max <= 0) { cur = 0; return; }
+        if (cur < 0)    cur = 0;
+        if (cur >= max) cur = max - 1;
+    }
+    inline int clamped(int v, int mx) {
+        if (mx <= 0) return 0;
+        if (v < 0)   return 0;
+        if (v >= mx) return mx - 1;
+        return v;
+    }
+    inline std::string header(const std::string& s) {
+        return std::string(CLR_ACCENT) + ANSI_BOLD + s + ANSI_RESET;
+    }
+    inline std::string dim(const std::string& s) {
+        return std::string(CLR_SECONDARY) + s + ANSI_RESET;
+    }
+}
+
 // ─── Screen interface ─────────────────────────────────────────────────────────
 class Screen {
 public:
@@ -28,7 +49,6 @@ public:
     std::string title() const override { return "BATTLE"; }
 private:
     enum class Mode { Main, ItemSelect, Result };
-    void clamp(int& cur, int max);
     void handleSelect();
     void handleUseItem();
     int  findConsumableSlot(int n) const;
@@ -48,7 +68,6 @@ public:
     std::string title() const override { return "SHOP"; }
 private:
     enum class Mode { Main, BuyWeapons, BuyItems, Sell };
-    void clamp(int& cur, int max);
     void handleSelect();
     void handleBuyWeapon();
     void handleBuyItem();
@@ -72,7 +91,6 @@ public:
     std::string title() const override { return "INVENTORY"; }
 private:
     enum class Mode { Main, Weapons, Consumables, Materials, UseItem };
-    void clamp(int& cur, int max);
     void handleSelect();
     void handleUseItem();
     int  findConsumableSlot(int n) const;
@@ -92,7 +110,6 @@ public:
     std::string title() const override { return "EQUIP WEAPON"; }
 private:
     struct Entry { std::shared_ptr<Weapon> weapon; int slotIdx; };
-    void clamp(int& cur, int max);
     void handleEquip();
     std::vector<Entry> getEquippable() const;
     Player* player_;

@@ -93,6 +93,7 @@ Key Terminal::readKey(char& outChar) {
 #include <termios.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <poll.h>
 
 static struct termios origTermios;
 
@@ -126,15 +127,20 @@ Key Terminal::readKey(char& outChar) {
     if (c == 17) return Key::CtrlQ;
     if (c == '\n' || c == '\r') return Key::Enter;
     if (c == 27) {
-        char seq[3];
-        if (read(STDIN_FILENO, &seq[0], 1) != 1) return Key::Escape;
-        if (read(STDIN_FILENO, &seq[1], 1) != 1) return Key::Escape;
-        if (seq[0] == '[') {
-            switch (seq[1]) {
-            case 'A': return Key::Up;
-            case 'B': return Key::Down;
-            case 'C': return Key::Right;
-            case 'D': return Key::Left;
+        struct pollfd pfd = { STDIN_FILENO, POLLIN, 0 };
+        if (poll(&pfd, 1, 50) > 0) {
+            char seq[3];
+            if (read(STDIN_FILENO, &seq[0], 1) != 1) return Key::Escape;
+            if (poll(&pfd, 1, 50) > 0) {
+                if (read(STDIN_FILENO, &seq[1], 1) != 1) return Key::Escape;
+                if (seq[0] == '[') {
+                    switch (seq[1]) {
+                    case 'A': return Key::Up;
+                    case 'B': return Key::Down;
+                    case 'C': return Key::Right;
+                    case 'D': return Key::Left;
+                    }
+                }
             }
         }
         return Key::Escape;
