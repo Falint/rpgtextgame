@@ -1,17 +1,21 @@
 # TextRPG (C++ Version)
 
-A professional, modern, and clean text-based RPG written in C++17, featuring an interactive Terminal UI (TUI) and data-driven systems.
-
-## Features
-
-- **Terminal UI**: Fast, interactive menu-driven interface with ANSI color support.
-- **Turn-Based Combat**: Engaging battle system with elemental strengths/weaknesses.
-- **Weapon Upgrades**: Robust crafting and progression system using material drops.
-- **Modular Architecture**: Clean separation of Domain, Data, Game Services, and TUI layers.
+A professional, modern, and clean text-based RPG written in C++17, featuring an interactive Terminal UI (TUI), cross-platform CMake build system, and Docker support for portable deployment.
 
 ---
 
-## 🏗 System Architecture Flowchart
+## Features
+
+* **Terminal UI**: Fast, interactive menu-driven interface with ANSI color support
+* **Turn-Based Combat**: Engaging battle system with elemental strengths and weaknesses
+* **Weapon Upgrades**: Crafting and progression system using monster drops
+* **Modular Architecture**: Clear separation of Domain, Data, Game Services, and TUI layers
+* **Cross-Platform Build**: Native support for Windows and Linux using CMake
+* **Docker Support**: Run the project consistently across environments without manual dependency setup
+
+---
+
+## System Architecture Flowchart
 
 ```mermaid
 graph TD
@@ -32,112 +36,108 @@ graph TD
 
 ---
 
-## 🎮 Pseudocode Implementations
+## Build Instructions
 
-### 1. Main Game Loop
+---
 
-```text
-Initialize Terminal (ANSI, Raw Mode)
-Instantiate Game Services & Data Registries
-Instantiate App
+### Native Build (CMake)
 
-WHILE App.isRunning() DO
-    Clear Terminal & Draw Layout (Menu, Character Panel, Active Screen)
-    Wait for Input (Blocking/Polling)
-    Key = readKey()
-    
-    IF Key is 'Quit' THEN
-        App.stop()
-        BREAK
-    
-    IF User is interacting with an Active Screen THEN
-        KeepOpen = ActiveScreen.update(Key)
-        IF NOT KeepOpen THEN
-            Close Active Screen
-            Return focus to Main Menu
-        END IF
-    ELSE
-        Handle Main Menu Navigation (Up, Down, Select)
-    END IF
-END WHILE
+Build locally using CMake:
 
-Disable Raw Mode & Exit
+```bash
+cmake -B build -G "MinGW Makefiles"
+cmake --build build
 ```
 
-### 2. Menu System (Navigation)
+Run the game:
 
-```text
-FUNCTION handleMenuSelect(MenuChoice)
-    SWITCH MenuChoice DO
-        CASE 'Battle':
-            BattleService.startBattle()
-            Set Active Screen = BattleScreen
-        CASE 'Shop':
-            Set Active Screen = ShopScreen
-        CASE 'Inventory':
-            Set Active Screen = InventoryScreen
-        CASE 'Upgrade':
-            Set Active Screen = UpgradeScreen
-        CASE 'Status':
-            Set Active Screen = StatusScreen
-        CASE 'Exit':
-            Exit Game
-    END SWITCH
-    Set Focus = Active Screen
-END FUNCTION
+```bash
+./build/textrpg
 ```
 
-### 3. Battle System Flow
+For Windows:
 
-```text
-FUNCTION BattleScreen.update(InputKey)
-    IF Mode == Result Screen THEN
-        IF InputKey == Enter THEN Exit BattleScreen
-        RETURN
-    END IF
-    
-    Handle Navigation (Select Action: Attack, Use Item, Escape)
-    
-    IF InputKey == Enter THEN
-        SWITCH SelectedAction DO
-            CASE Attack:
-                Calculate Damage (Player ATK + Weapon vs Enemy DEF)
-                Apply Damage to Enemy
-                IF Enemy.isDead() THEN 
-                    Award Loot & Exp
-                    Set Mode = Result Screen
-                ELSE
-                    Enemy Attacks Player
-                END IF
-            
-            CASE Use Item:
-                Show Inventory Items -> Apply Healing -> Enemy Attacks
-                
-            CASE Escape:
-                Calculate Escape Chance
-                IF Success THEN Set Mode = Result Screen
-                ELSE Enemy Attacks
-        END SWITCH
-    END IF
-END FUNCTION
+```bash
+.\build\textrpg.exe
 ```
 
 ---
 
-## Build Instructions
+## Quick Start
 
-To build the game on Linux:
+### For Windows Users
+Download textrpg.exe from Releases and run directly
+
+### For Developers
+Use CMake native build
+
+### For Portable Deployment
+Use Docker
+
+### Docker Build
+
+Build the Docker image:
 
 ```bash
-# Compile using Makefile
-make -f makefile_linux
-
-# Run the game
-./textrpg
+docker build -t textrpg .
 ```
+
+Run the game inside Docker:
+
+```bash
+docker run -it textrpg
+```
+
+This ensures the game runs consistently on any machine with Docker installed.
+
+---
 
 ## Requirements
 
-- `g++` (GCC) with C++17 support
-- Make
-- A modern terminal emulator (for ANSI rendering)
+### Native Build
+
+* C++17 compatible compiler (`g++`, MinGW, GCC, or MSVC)
+* CMake 3.10+
+* Make (for MinGW/Linux builds)
+
+### Docker Build
+
+* Docker Desktop
+* WSL2 (recommended for Windows)
+
+---
+
+## Project Structure
+
+```text
+rpgtextgame/
+├── src/
+│   ├── data/
+│   ├── domain/
+│   ├── game/
+│   ├── tui/
+│   └── main.cpp
+│
+├── build/
+├── Dockerfile
+├── CMakeLists.txt
+├── .gitignore
+├── .dockerignore
+└── README.md
+```
+
+---
+
+## Development Notes
+
+This project was refactored from platform-specific Makefiles into a professional CMake-based cross-platform build system with Docker deployment support.
+
+This improves:
+
+* maintainability
+* portability
+* deployment consistency
+* recruiter-facing project quality
+* production-readiness
+
+---
