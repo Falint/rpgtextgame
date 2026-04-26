@@ -1,3 +1,0 @@
-C:/Users/hazak/Documents/GitHub/rpgtextgame/build/CMakeFiles/textrpg.dir
-C:/Users/hazak/Documents/GitHub/rpgtextgame/build/CMakeFiles/edit_cache.dir
-C:/Users/hazak/Documents/GitHub/rpgtextgame/build/CMakeFiles/rebuild_cache.dir
