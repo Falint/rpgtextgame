@@ -1,0 +1,21 @@
+# Git
+.git
+.gitignore
+
+# Build output
+build/
+
+# IDE settings
+.vscode/
+.idea/
+
+# Local binaries
+*.exe
+*.out
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

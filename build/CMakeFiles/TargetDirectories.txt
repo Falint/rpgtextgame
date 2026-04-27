@@ -1,3 +1,0 @@
-/home/tenyom/tugas/game/build/CMakeFiles/textrpg.dir
-/home/tenyom/tugas/game/build/CMakeFiles/edit_cache.dir
-/home/tenyom/tugas/game/build/CMakeFiles/rebuild_cache.dir
