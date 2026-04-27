@@ -1,7 +1,7 @@
 {
 	"InstallScripts" : 
 	[
-		"C:/Users/hazak/Documents/GitHub/rpgtextgame/build/cmake_install.cmake"
+		"/home/tenyom/tugas/game/build/cmake_install.cmake"
 	],
 	"Parallel" : false
 }
