@@ -167,6 +167,12 @@ CMakeFiles/textrpg.dir/src/tui/screens2.cpp.o: \
  /home/tenyom/tugas/game/src/tui/../game/../data/items.hpp \
  /home/tenyom/tugas/game/src/tui/../game/../data/weapons.hpp \
  /home/tenyom/tugas/game/src/tui/../data/upgrades.hpp \
+ /usr/include/c++/15.2.1/algorithm \
+ /usr/include/c++/15.2.1/bits/stl_algo.h \
+ /usr/include/c++/15.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/15.2.1/bits/stl_heap.h \
+ /usr/include/c++/15.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/15.2.1/pstl/glue_algorithm_defs.h \
  /usr/include/c++/15.2.1/sstream /usr/include/c++/15.2.1/istream \
  /usr/include/c++/15.2.1/ios /usr/include/c++/15.2.1/bits/ios_base.h \
  /usr/include/c++/15.2.1/bits/locale_classes.h \
@@ -187,10 +193,4 @@ CMakeFiles/textrpg.dir/src/tui/screens2.cpp.o: \
  /usr/include/c++/15.2.1/ostream /usr/include/c++/15.2.1/bits/ostream.h \
  /usr/include/c++/15.2.1/bits/ostream.tcc \
  /usr/include/c++/15.2.1/bits/istream.tcc \
- /usr/include/c++/15.2.1/bits/sstream.tcc \
- /usr/include/c++/15.2.1/algorithm \
- /usr/include/c++/15.2.1/bits/stl_algo.h \
- /usr/include/c++/15.2.1/bits/algorithmfwd.h \
- /usr/include/c++/15.2.1/bits/stl_heap.h \
- /usr/include/c++/15.2.1/bits/uniform_int_dist.h \
- /usr/include/c++/15.2.1/pstl/glue_algorithm_defs.h
+ /usr/include/c++/15.2.1/bits/sstream.tcc
