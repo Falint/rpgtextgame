@@ -160,4 +160,5 @@ CMakeFiles/textrpg.dir/src/game/battle_service.cpp.o: \
  /home/tenyom/tugas/game/src/game/../domain/errors.hpp \
  /home/tenyom/tugas/game/src/game/../domain/inventory.hpp \
  /home/tenyom/tugas/game/src/game/../domain/weapon.hpp \
+ /home/tenyom/tugas/game/src/game/../data/items.hpp \
  /home/tenyom/tugas/game/src/game/item_service.hpp

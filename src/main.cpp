@@ -32,7 +32,7 @@ int main() {
 
     // ── Services ──────────────────────────────────────────────────────────────
     ItemService   itemSvc;
-    BattleService battle(player.get(), &monsters, &itemSvc);
+    BattleService battle(player.get(), &monsters, &itemSvc, &items);
     ShopService   shop(player.get(), &weapons, &items);
 
     // ── TUI App ───────────────────────────────────────────────────────────────

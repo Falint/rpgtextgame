@@ -2,6 +2,7 @@
 #include "../data/monsters.hpp"
 #include "../domain/enemy.hpp"
 #include "../domain/player.hpp"
+#include "../data/items.hpp"
 #include "item_service.hpp"
 #include <memory>
 #include <string>
@@ -12,7 +13,7 @@ enum class BattleState { None = 0, PlayerTurn, EnemyTurn, Won, Lost, Escaped };
 class BattleService {
 public:
   BattleService(Player *player, MonsterRegistry *monsterReg,
-                ItemService *itemService);
+                ItemService *itemService, ItemRegistry *itemReg);
 
   void startBattle(MonsterType type);
   void attack();
@@ -38,6 +39,7 @@ private:
   Player *player_;
   MonsterRegistry *monsterReg_;
   ItemService *itemService_;
+  ItemRegistry *itemReg_;
 
   std::shared_ptr<Enemy> enemy_;
   BattleState state_ = BattleState::None;

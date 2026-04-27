@@ -162,9 +162,9 @@ CMakeFiles/textrpg.dir/src/tui/screens.cpp.o: \
  /usr/include/c++/15.2.1/bits/stl_multimap.h \
  /usr/include/c++/15.2.1/bits/erase_if.h \
  /home/tenyom/tugas/game/src/tui/../game/../data/../domain/enemy.hpp \
+ /home/tenyom/tugas/game/src/tui/../game/../data/items.hpp \
  /home/tenyom/tugas/game/src/tui/../game/item_service.hpp \
  /home/tenyom/tugas/game/src/tui/../game/shop_service.hpp \
- /home/tenyom/tugas/game/src/tui/../game/../data/items.hpp \
  /home/tenyom/tugas/game/src/tui/../game/../data/weapons.hpp \
  /home/tenyom/tugas/game/src/tui/../data/upgrades.hpp \
  /usr/include/c++/15.2.1/sstream /usr/include/c++/15.2.1/istream \
