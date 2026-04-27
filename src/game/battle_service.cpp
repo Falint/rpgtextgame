@@ -10,8 +10,8 @@ constexpr int BATTLE_LOG_CAP = 20;
 } // anonymous namespace
 
 BattleService::BattleService(Player *player, MonsterRegistry *monsterReg,
-                             ItemService *itemService)
-    : player_(player), monsterReg_(monsterReg), itemService_(itemService) {
+                             ItemService *itemService, ItemRegistry *itemReg)
+    : player_(player), monsterReg_(monsterReg), itemService_(itemService), itemReg_(itemReg) {
   logs_.reserve(BATTLE_LOG_CAP);
 }
 
@@ -125,6 +125,20 @@ void BattleService::onEnemyDefeated() {
   player_->addGold(gold);
   addLog(enemy_->name + " has been defeated!");
   addLog("You earned " + std::to_string(gold) + " gold!");
+
+  auto *tmpl = monsterReg_->getByID(enemy_->id);
+  if (tmpl) {
+    for (const auto &loot : tmpl->lootTable) {
+      float roll = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
+      if (roll <= loot.dropChance) {
+        auto *itemTmpl = itemReg_->getByID(loot.itemID);
+        if (itemTmpl) {
+          player_->inventory->addItem(itemTmpl->toItem(), 1);
+          addLog("Dropped: " + itemTmpl->name + "!");
+        }
+      }
+    }
+  }
 }
 
 void BattleService::addLog(const std::string &msg) {
