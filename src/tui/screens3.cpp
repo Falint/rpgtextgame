@@ -9,29 +9,35 @@
 InventoryScreen::InventoryScreen(Player* p, ItemService* svc): player_(p), svc_(svc){}
 bool InventoryScreen::update(Key key, char ch){
     if(key==Key::Up||(key==Key::Char&&ch=='k')){if(cursor_>0)--cursor_;return true;}
-    if(key==Key::Down||(key==Key::Char&&ch=='j')){++cursor_;return true;}
-    if(key==Key::Enter){handleSelect();return true;}
+    if(key==Key::Down||(key==Key::Char&&ch=='j')){
+        int maxIdx = (mode_==Mode::Main) ? 4 : cursor_;
+        if(cursor_<maxIdx)++cursor_;
+        return true;
+    }
+    if(key==Key::Enter){
+        if(mode_==Mode::Main){
+            switch(cursor_){
+            case 0: mode_=Mode::Weapons;     cursor_=0; break;
+            case 1: mode_=Mode::Consumables; cursor_=0; break;
+            case 2: mode_=Mode::Materials;   cursor_=0; break;
+            case 3: mode_=Mode::UseItem;     cursor_=0; break;
+            case 4: return false;
+            }
+        } else if(mode_==Mode::UseItem) handleUseItem();
+        return true;
+    }
     if(key==Key::Escape||key==Key::Backspace){
         if(mode_!=Mode::Main){mode_=Mode::Main;cursor_=0;msg_="";return true;}
         return false;
     }
     if(key>=Key::K1&&key<=Key::K5&&mode_==Mode::Main){
         cursor_=static_cast<int>(key)-static_cast<int>(Key::K1);
-        handleSelect();
+        update(Key::Enter,0);
     }
     return true;
 }
 void InventoryScreen::handleSelect(){
-    if(mode_==Mode::Main){
-        switch(cursor_){
-        case 0: mode_=Mode::Weapons;     cursor_=0; break;
-        case 1: mode_=Mode::Consumables; cursor_=0; break;
-        case 2: mode_=Mode::Materials;   cursor_=0; break;
-        case 3: mode_=Mode::UseItem;     cursor_=0; break;
-        case 4: /* exit */ break;
-        }
-        return;
-    }
+    // Note: Main-mode selection is now handled directly in update()
     if(mode_==Mode::UseItem) handleUseItem();
 }
 void InventoryScreen::handleUseItem(){

@@ -11,29 +11,37 @@ ShopScreen::ShopScreen(ShopService* svc, WeaponRegistry* w, ItemRegistry* it, Pl
 
 bool ShopScreen::update(Key key, char ch) {
     if (key==Key::Up   ||(key==Key::Char&&ch=='k')) { if(cursor_>0)--cursor_; return true; }
-    if (key==Key::Down ||(key==Key::Char&&ch=='j')) { ++cursor_; return true; }
-    if (key==Key::Enter) { handleSelect(); return true; }
+    if (key==Key::Down ||(key==Key::Char&&ch=='j')) {
+        int maxIdx = (mode_==Mode::Main) ? 3 : cursor_;
+        if(cursor_<maxIdx)++cursor_;
+        return true;
+    }
+    if (key==Key::Enter) {
+        if (mode_==Mode::Main) {
+            switch(cursor_) {
+            case 0: mode_=Mode::BuyWeapons; cursor_=0; msg_=""; break;
+            case 1: mode_=Mode::BuyItems;   cursor_=0; msg_=""; break;
+            case 2: mode_=Mode::Sell;       cursor_=0; msg_=""; break;
+            case 3: return false;
+            }
+        } else {
+            handleSelect();
+        }
+        return true;
+    }
     if (key==Key::Escape||key==Key::Backspace) {
         if (mode_!=Mode::Main) { mode_=Mode::Main; cursor_=0; msg_=""; return true; }
         return false;
     }
-    if (key>=Key::K1 && key<=Key::K9) {
+    if (key>=Key::K1 && key<=Key::K4 && mode_==Mode::Main) {
         cursor_ = static_cast<int>(key) - static_cast<int>(Key::K1);
-        handleSelect();
+        update(Key::Enter, 0);
     }
     return true;
 }
 
 void ShopScreen::handleSelect() {
-    if (mode_==Mode::Main) {
-        switch(cursor_) {
-        case 0: mode_=Mode::BuyWeapons; cursor_=0; msg_=""; break;
-        case 1: mode_=Mode::BuyItems;   cursor_=0; msg_=""; break;
-        case 2: mode_=Mode::Sell;       cursor_=0; msg_=""; break;
-        default: break;
-        }
-        return;
-    }
+    // Note: Main-mode selection is now handled directly in update()
     if (mode_==Mode::BuyWeapons) { handleBuyWeapon(); return; }
     if (mode_==Mode::BuyItems)   { handleBuyItem();   return; }
     if (mode_==Mode::Sell)       { handleSell();      return; }
