@@ -12,7 +12,16 @@ ShopScreen::ShopScreen(ShopService* svc, WeaponRegistry* w, ItemRegistry* it, Pl
 bool ShopScreen::update(Key key, char ch) {
     if (key==Key::Up   ||(key==Key::Char&&ch=='k')) { if(cursor_>0)--cursor_; return true; }
     if (key==Key::Down ||(key==Key::Char&&ch=='j')) {
-        int maxIdx = (mode_==Mode::Main) ? 3 : cursor_;
+        int maxIdx = 0;
+        if (mode_==Mode::Main) {
+            maxIdx = 3;
+        } else if (mode_==Mode::BuyWeapons) {
+            maxIdx = (int)svc_->getShopWeapons().size() - 1;
+        } else if (mode_==Mode::BuyItems) {
+            maxIdx = (int)svc_->getShopItems().size() - 1;
+        } else if (mode_==Mode::Sell) {
+            maxIdx = (int)player_->inventory->getOccupiedSlots().size() - 1;
+        }
         if(cursor_<maxIdx)++cursor_;
         return true;
     }
