@@ -1370,6 +1370,7 @@ CMakeFiles/textrpg.dir/src/domain/player.cpp.o: /home/tenyom/tugas/game/src/doma
 CMakeFiles/textrpg.dir/src/game/battle_service.cpp.o: /home/tenyom/tugas/game/src/game/battle_service.cpp \
   /home/tenyom/tugas/game/src/domain/element.hpp \
   /home/tenyom/tugas/game/src/domain/enemy.hpp \
+  /home/tenyom/tugas/game/src/data/items.hpp \
   /home/tenyom/tugas/game/src/data/monsters.hpp \
   /home/tenyom/tugas/game/src/domain/errors.hpp \
   /home/tenyom/tugas/game/src/domain/inventory.hpp \
