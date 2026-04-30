@@ -1,0 +1,150 @@
+{
+  "monsters": [
+    {
+      "id": "slime",
+      "name": "Slime",
+      "type": "Normal",
+      "element": "Water",
+      "baseHP": 30,
+      "baseAtk": 8,
+      "baseDef": 2,
+      "goldMin": 10,
+      "goldMax": 20,
+      "loot": [
+        { "itemId": "slime_gel", "dropChance": 0.5 }, 
+        { "itemId" : "ember_stone", "dropChance" : 1}
+      ]
+    },
+    {
+      "id": "goblin",
+      "name": "Goblin",
+      "type": "Normal",
+      "element": "None",
+      "baseHP": 40,
+      "baseAtk": 12,
+      "baseDef": 4,
+      "goldMin": 15,
+      "goldMax": 30,
+      "loot": [
+        { "itemId": "goblin_ear", "dropChance": 0.3 }
+      ]
+    },
+    {
+      "id": "wolf",
+      "name": "Wild Wolf",
+      "type": "Normal",
+      "element": "Wind",
+      "baseHP": 35,
+      "baseAtk": 15,
+      "baseDef": 3,
+      "goldMin": 12,
+      "goldMax": 25,
+      "loot": [
+        { "itemId": "wolf_pelt", "dropChance": 0.4 },
+        { "itemId": "ember_stone", "dropChance": 0.9 }
+      ]
+    },
+    {
+      "id": "skeleton",
+      "name": "Skeleton",
+      "type": "Normal",
+      "element": "None",
+      "baseHP": 45,
+      "baseAtk": 14,
+      "baseDef": 6,
+      "goldMin": 18,
+      "goldMax": 35,
+      "loot": [
+        { "itemId": "bone_fragment", "dropChance": 0.6 }
+      ]
+    },
+    {
+      "id": "bat",
+      "name": "Giant Bat",
+      "type": "Normal",
+      "element": "Wind",
+      "baseHP": 25,
+      "baseAtk": 10,
+      "baseDef": 2,
+      "goldMin": 8,
+      "goldMax": 18,
+      "loot": [
+        { "itemId": "bat_wing", "dropChance": 0.45 }
+      ]
+    },
+    {
+      "id": "goblin_chief",
+      "name": "Goblin Chief",
+      "type": "Elite",
+      "element": "Fire",
+      "baseHP": 80,
+      "baseAtk": 22,
+      "baseDef": 10,
+      "goldMin": 40,
+      "goldMax": 70,
+      "loot": [
+        { "itemId": "goblin_ear", "dropChance": 1.0 },
+        { "itemId": "iron_ore", "dropChance": 0.5 }
+      ]
+    },
+    {
+      "id": "dire_wolf",
+      "name": "Dire Wolf",
+      "type": "Elite",
+      "element": "Wind",
+      "baseHP": 70,
+      "baseAtk": 28,
+      "baseDef": 8,
+      "goldMin": 35,
+      "goldMax": 60,
+      "loot": [
+        { "itemId": "wolf_pelt", "dropChance": 1.0 },
+        { "itemId": "wolf_fang", "dropChance": 0.4 }
+      ]
+    },
+    {
+      "id": "flame_elemental",
+      "name": "Flame Elemental",
+      "type": "Elite",
+      "element": "Fire",
+      "baseHP": 60,
+      "baseAtk": 35,
+      "baseDef": 5,
+      "goldMin": 45,
+      "goldMax": 80,
+      "loot": [
+        { "itemId": "fire_essence", "dropChance": 0.6 }
+      ]
+    },
+    {
+      "id": "dragon",
+      "name": "Ancient Dragon",
+      "type": "Boss",
+      "element": "Fire",
+      "baseHP": 200,
+      "baseAtk": 45,
+      "baseDef": 20,
+      "goldMin": 150,
+      "goldMax": 300,
+      "loot": [
+        { "itemId": "dragon_scale", "dropChance": 1.0 },
+        { "itemId": "fire_essence", "dropChance": 1.0 }
+      ]
+    },
+    {
+      "id": "lich",
+      "name": "Lich King",
+      "type": "Boss",
+      "element": "None",
+      "baseHP": 180,
+      "baseAtk": 40,
+      "baseDef": 15,
+      "goldMin": 120,
+      "goldMax": 250,
+      "loot": [
+        { "itemId": "dark_crystal", "dropChance": 1.0 },
+        { "itemId": "bone_fragment", "dropChance": 1.0 }
+      ]
+    }
+  ]
+}

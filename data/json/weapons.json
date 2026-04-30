@@ -1,0 +1,229 @@
+{
+  "weapons": [
+    {
+      "id": "fists",
+      "name": "Fists",
+      "description": "Your bare hands.",
+      "type": "Fist",
+      "element": "None",
+      "baseDamage": 5,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "maxTier": 1
+    },
+    {
+      "id": "rusty_sword",
+      "name": "Rusty Sword",
+      "description": "Old, covered in rust.",
+      "type": "Sword",
+      "element": "None",
+      "baseDamage": 8,
+      "buyPrice": 0,
+      "sellPrice": 15,
+      "maxTier": 1
+    },
+    {
+      "id": "iron_sword",
+      "name": "Iron Sword",
+      "description": "Sturdy iron blade.",
+      "type": "Sword",
+      "element": "None",
+      "baseDamage": 15,
+      "buyPrice": 100,
+      "sellPrice": 50,
+      "maxTier": 5
+    },
+    {
+      "id": "steel_sword",
+      "name": "Steel Sword",
+      "description": "Forged from high-quality steel.",
+      "type": "Sword",
+      "element": "None",
+      "baseDamage": 22,
+      "buyPrice": 250,
+      "sellPrice": 125,
+      "maxTier": 5
+    },
+    {
+      "id": "fire_blade",
+      "name": "Fire Blade",
+      "description": "Sword imbued with flames.",
+      "type": "Sword",
+      "element": "Fire",
+      "baseDamage": 20,
+      "buyPrice": 300,
+      "sellPrice": 150,
+      "maxTier": 5
+    },
+    {
+      "id": "aqua_saber",
+      "name": "Aqua Saber",
+      "description": "Blade of crystallized water.",
+      "type": "Sword",
+      "element": "Water",
+      "baseDamage": 20,
+      "buyPrice": 300,
+      "sellPrice": 150,
+      "maxTier": 5
+    },
+    {
+      "id": "earth_cleaver",
+      "name": "Earth Cleaver",
+      "description": "Heavy blade infused with earth.",
+      "type": "Sword",
+      "element": "Earth",
+      "baseDamage": 20,
+      "buyPrice": 300,
+      "sellPrice": 150,
+      "maxTier": 5
+    },
+    {
+      "id": "wind_cutter",
+      "name": "Wind Cutter",
+      "description": "Swift blade that cuts like wind.",
+      "type": "Sword",
+      "element": "Wind",
+      "baseDamage": 18,
+      "buyPrice": 280,
+      "sellPrice": 140,
+      "maxTier": 5
+    },
+    {
+      "id": "iron_axe",
+      "name": "Iron Axe",
+      "description": "A heavy axe.",
+      "type": "Axe",
+      "element": "None",
+      "baseDamage": 20,
+      "buyPrice": 150,
+      "sellPrice": 75,
+      "maxTier": 5
+    },
+    {
+      "id": "battle_axe",
+      "name": "Battle Axe",
+      "description": "A warrior's axe.",
+      "type": "Axe",
+      "element": "None",
+      "baseDamage": 28,
+      "buyPrice": 0,
+      "sellPrice": 100,
+      "maxTier": 5
+    },
+    {
+      "id": "wooden_staff",
+      "name": "Wooden Staff",
+      "description": "A simple staff.",
+      "type": "Staff",
+      "element": "None",
+      "baseDamage": 10,
+      "buyPrice": 80,
+      "sellPrice": 40,
+      "maxTier": 3
+    },
+    {
+      "id": "fire_staff",
+      "name": "Fire Staff",
+      "description": "Channels the power of flames.",
+      "type": "Staff",
+      "element": "Fire",
+      "baseDamage": 18,
+      "buyPrice": 280,
+      "sellPrice": 140,
+      "maxTier": 5
+    },
+    {
+      "id": "ice_staff",
+      "name": "Ice Staff",
+      "description": "Frozen magic flows through it.",
+      "type": "Staff",
+      "element": "Water",
+      "baseDamage": 18,
+      "buyPrice": 280,
+      "sellPrice": 140,
+      "maxTier": 5
+    },
+    {
+      "id": "iron_dagger",
+      "name": "Iron Dagger",
+      "description": "Quick and deadly.",
+      "type": "Dagger",
+      "element": "None",
+      "baseDamage": 12,
+      "buyPrice": 80,
+      "sellPrice": 40,
+      "maxTier": 5
+    },
+    {
+      "id": "assassin_blade",
+      "name": "Assassin Blade",
+      "description": "A shadowy dagger.",
+      "type": "Dagger",
+      "element": "Wind",
+      "baseDamage": 16,
+      "buyPrice": 220,
+      "sellPrice": 110,
+      "maxTier": 5
+    },
+    {
+      "id": "hunting_bow",
+      "name": "Hunting Bow",
+      "description": "Reliable bow for combat.",
+      "type": "Bow",
+      "element": "None",
+      "baseDamage": 14,
+      "buyPrice": 120,
+      "sellPrice": 60,
+      "maxTier": 5
+    },
+    {
+      "id": "gale_bow",
+      "name": "Gale Bow",
+      "description": "Arrows fly swift as the wind.",
+      "type": "Bow",
+      "element": "Wind",
+      "baseDamage": 18,
+      "buyPrice": 260,
+      "sellPrice": 130,
+      "maxTier": 5
+    },
+    {
+      "id": "dragon_slayer",
+      "name": "Dragon Slayer",
+      "description": "Forged from dragon scales.",
+      "type": "Sword",
+      "element": "Fire",
+      "baseDamage": 45,
+      "buyPrice": 0,
+      "sellPrice": 500,
+      "maxTier": 5
+    },
+    {
+      "id": "titan_hammer",
+      "name": "Titan's Hammer",
+      "description": "Weapon of the earth titans.",
+      "type": "Axe",
+      "element": "Earth",
+      "baseDamage": 50,
+      "buyPrice": 0,
+      "sellPrice": 600,
+      "maxTier": 5
+    }
+  ],
+  "shop": [
+    { "weaponId": "iron_sword",     "stock": -1, "sortOrder": 1 },
+    { "weaponId": "steel_sword",    "stock": -1, "sortOrder": 2 },
+    { "weaponId": "fire_blade",     "stock":  1, "sortOrder": 3 },
+    { "weaponId": "aqua_saber",     "stock":  1, "sortOrder": 4 },
+    { "weaponId": "earth_cleaver",  "stock":  1, "sortOrder": 5 },
+    { "weaponId": "wind_cutter",    "stock":  1, "sortOrder": 6 },
+    { "weaponId": "iron_axe",       "stock": -1, "sortOrder": 7 },
+    { "weaponId": "wooden_staff",   "stock": -1, "sortOrder": 8 },
+    { "weaponId": "fire_staff",     "stock":  1, "sortOrder": 9 },
+    { "weaponId": "ice_staff",      "stock":  1, "sortOrder": 10 },
+    { "weaponId": "iron_dagger",    "stock": -1, "sortOrder": 11 },
+    { "weaponId": "assassin_blade", "stock":  1, "sortOrder": 12 },
+    { "weaponId": "hunting_bow",    "stock": -1, "sortOrder": 13 },
+    { "weaponId": "gale_bow",       "stock":  1, "sortOrder": 14 }
+  ]
+}

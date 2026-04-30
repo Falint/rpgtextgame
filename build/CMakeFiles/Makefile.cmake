@@ -8,9 +8,13 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
   "/home/tenyom/tugas/game/CMakeLists.txt"
-  "CMakeFiles/4.3.1/CMakeCCompiler.cmake"
-  "CMakeFiles/4.3.1/CMakeCXXCompiler.cmake"
-  "CMakeFiles/4.3.1/CMakeSystem.cmake"
+  "CMakeFiles/4.3.2/CMakeCCompiler.cmake"
+  "CMakeFiles/4.3.2/CMakeCXXCompiler.cmake"
+  "CMakeFiles/4.3.2/CMakeSystem.cmake"
+  "_deps/json-src/CMakeLists.txt"
+  "_deps/json-src/cmake/config.cmake.in"
+  "_deps/json-src/cmake/nlohmann_jsonConfigVersion.cmake.in"
+  "_deps/json-src/cmake/pkg-config.pc.in"
   "/usr/share/cmake/Modules/CMakeCCompiler.cmake.in"
   "/usr/share/cmake/Modules/CMakeCCompilerABI.c"
   "/usr/share/cmake/Modules/CMakeCInformation.cmake"
@@ -30,6 +34,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake/Modules/CMakeGenericSystem.cmake"
   "/usr/share/cmake/Modules/CMakeInitializeConfigs.cmake"
   "/usr/share/cmake/Modules/CMakeLanguageInformation.cmake"
+  "/usr/share/cmake/Modules/CMakePackageConfigHelpers.cmake"
   "/usr/share/cmake/Modules/CMakeParseImplicitIncludeInfo.cmake"
   "/usr/share/cmake/Modules/CMakeParseImplicitLinkInfo.cmake"
   "/usr/share/cmake/Modules/CMakeParseLibraryArchitecture.cmake"
@@ -100,6 +105,11 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake"
   "/usr/share/cmake/Modules/Compiler/zOS-C-DetermineCompiler.cmake"
   "/usr/share/cmake/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake"
+  "/usr/share/cmake/Modules/ExternalProject.cmake"
+  "/usr/share/cmake/Modules/ExternalProject/shared_internal_commands.cmake"
+  "/usr/share/cmake/Modules/FetchContent.cmake"
+  "/usr/share/cmake/Modules/FetchContent/CMakeLists.cmake.in"
+  "/usr/share/cmake/Modules/GNUInstallDirs.cmake"
   "/usr/share/cmake/Modules/Internal/CMakeCLinkerInformation.cmake"
   "/usr/share/cmake/Modules/Internal/CMakeCXXLinkerInformation.cmake"
   "/usr/share/cmake/Modules/Internal/CMakeCommonLinkerInformation.cmake"
@@ -121,6 +131,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake/Modules/Platform/Linux-Initialize.cmake"
   "/usr/share/cmake/Modules/Platform/Linux.cmake"
   "/usr/share/cmake/Modules/Platform/UnixPaths.cmake"
+  "/usr/share/cmake/Modules/WriteBasicConfigVersionFile.cmake"
   )
 
 # The corresponding makefile is:
@@ -131,14 +142,19 @@ set(CMAKE_MAKEFILE_OUTPUTS
 
 # Byproducts of CMake generate step:
 set(CMAKE_MAKEFILE_PRODUCTS
-  "CMakeFiles/4.3.1/CMakeSystem.cmake"
-  "CMakeFiles/4.3.1/CMakeCCompiler.cmake"
-  "CMakeFiles/4.3.1/CMakeCXXCompiler.cmake"
-  "CMakeFiles/4.3.1/CMakeCCompiler.cmake"
-  "CMakeFiles/4.3.1/CMakeCCompiler.cmake"
-  "CMakeFiles/4.3.1/CMakeCXXCompiler.cmake"
-  "CMakeFiles/4.3.1/CMakeCXXCompiler.cmake"
+  "CMakeFiles/4.3.2/CMakeSystem.cmake"
+  "CMakeFiles/4.3.2/CMakeCCompiler.cmake"
+  "CMakeFiles/4.3.2/CMakeCXXCompiler.cmake"
+  "CMakeFiles/4.3.2/CMakeCCompiler.cmake"
+  "CMakeFiles/4.3.2/CMakeCCompiler.cmake"
+  "CMakeFiles/4.3.2/CMakeCXXCompiler.cmake"
+  "CMakeFiles/4.3.2/CMakeCXXCompiler.cmake"
+  "_deps/json-subbuild/CMakeLists.txt"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
+  "_deps/json-build/nlohmann_json.pc"
+  "_deps/json-build/nlohmann_jsonConfigVersion.cmake"
+  "_deps/json-build/nlohmann_jsonConfig.cmake"
+  "_deps/json-build/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:

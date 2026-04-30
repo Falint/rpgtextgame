@@ -12,6 +12,8 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/tenyom/tugas/game/src/data/monsters.cpp" "CMakeFiles/textrpg.dir/src/data/monsters.cpp.o" "gcc" "CMakeFiles/textrpg.dir/src/data/monsters.cpp.o.d"
   "/home/tenyom/tugas/game/src/data/upgrades.cpp" "CMakeFiles/textrpg.dir/src/data/upgrades.cpp.o" "gcc" "CMakeFiles/textrpg.dir/src/data/upgrades.cpp.o.d"
   "/home/tenyom/tugas/game/src/data/weapons.cpp" "CMakeFiles/textrpg.dir/src/data/weapons.cpp.o" "gcc" "CMakeFiles/textrpg.dir/src/data/weapons.cpp.o.d"
+  "/home/tenyom/tugas/game/src/db/data_loader.cpp" "CMakeFiles/textrpg.dir/src/db/data_loader.cpp.o" "gcc" "CMakeFiles/textrpg.dir/src/db/data_loader.cpp.o.d"
+  "/home/tenyom/tugas/game/src/db/json_helpers.cpp" "CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.o" "gcc" "CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.o.d"
   "/home/tenyom/tugas/game/src/domain/enemy.cpp" "CMakeFiles/textrpg.dir/src/domain/enemy.cpp.o" "gcc" "CMakeFiles/textrpg.dir/src/domain/enemy.cpp.o.d"
   "/home/tenyom/tugas/game/src/domain/inventory.cpp" "CMakeFiles/textrpg.dir/src/domain/inventory.cpp.o" "gcc" "CMakeFiles/textrpg.dir/src/domain/inventory.cpp.o.d"
   "/home/tenyom/tugas/game/src/domain/player.cpp" "CMakeFiles/textrpg.dir/src/domain/player.cpp.o" "gcc" "CMakeFiles/textrpg.dir/src/domain/player.cpp.o.d"

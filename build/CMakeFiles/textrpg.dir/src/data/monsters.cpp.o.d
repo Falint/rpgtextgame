@@ -153,4 +153,14 @@ CMakeFiles/textrpg.dir/src/data/monsters.cpp.o: \
  /usr/include/c++/15.2.1/pstl/glue_memory_defs.h \
  /usr/include/c++/15.2.1/pstl/execution_defs.h \
  /home/tenyom/tugas/game/src/data/../domain/enemy.hpp \
- /home/tenyom/tugas/game/src/data/../domain/element.hpp
+ /home/tenyom/tugas/game/src/data/../domain/element.hpp \
+ /home/tenyom/tugas/game/src/data/../db/data_loader.hpp \
+ /usr/include/c++/15.2.1/utility \
+ /usr/include/c++/15.2.1/bits/stl_relops.h \
+ /usr/include/c++/15.2.1/stdexcept \
+ /home/tenyom/tugas/game/src/data/../db/../data/weapons.hpp \
+ /home/tenyom/tugas/game/src/data/../db/../data/../domain/weapon.hpp \
+ /home/tenyom/tugas/game/src/data/../db/../data/items.hpp \
+ /home/tenyom/tugas/game/src/data/../db/../data/../domain/inventory.hpp \
+ /home/tenyom/tugas/game/src/data/../db/../data/../domain/errors.hpp \
+ /home/tenyom/tugas/game/src/data/../db/../data/upgrades.hpp

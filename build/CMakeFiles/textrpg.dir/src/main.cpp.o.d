@@ -105,15 +105,17 @@ CMakeFiles/textrpg.dir/src/main.cpp.o: \
  /usr/include/c++/15.2.1/backward/auto_ptr.h \
  /usr/include/c++/15.2.1/pstl/glue_memory_defs.h \
  /usr/include/c++/15.2.1/pstl/execution_defs.h \
- /home/tenyom/tugas/game/src/domain/player.hpp \
- /home/tenyom/tugas/game/src/domain/errors.hpp \
- /usr/include/c++/15.2.1/string \
+ /usr/include/c++/15.2.1/iostream /usr/include/c++/15.2.1/ostream \
+ /usr/include/c++/15.2.1/bits/ostream.h /usr/include/c++/15.2.1/ios \
  /usr/include/c++/15.2.1/bits/char_traits.h \
  /usr/include/c++/15.2.1/bits/localefwd.h \
  /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/c++locale.h \
  /usr/include/c++/15.2.1/clocale /usr/include/locale.h \
  /usr/include/bits/locale.h /usr/include/c++/15.2.1/cctype \
- /usr/include/ctype.h /usr/include/c++/15.2.1/bits/ostream_insert.h \
+ /usr/include/ctype.h /usr/include/c++/15.2.1/bits/ios_base.h \
+ /usr/include/c++/15.2.1/bits/locale_classes.h \
+ /usr/include/c++/15.2.1/string \
+ /usr/include/c++/15.2.1/bits/ostream_insert.h \
  /usr/include/c++/15.2.1/bits/cxxabi_forced.h \
  /usr/include/c++/15.2.1/bits/range_access.h \
  /usr/include/c++/15.2.1/initializer_list \
@@ -143,22 +145,42 @@ CMakeFiles/textrpg.dir/src/main.cpp.o: \
  /usr/include/c++/15.2.1/bits/memory_resource.h \
  /usr/include/c++/15.2.1/cstddef \
  /usr/include/c++/15.2.1/bits/uses_allocator_args.h \
- /home/tenyom/tugas/game/src/domain/inventory.hpp \
- /home/tenyom/tugas/game/src/domain/weapon.hpp \
- /home/tenyom/tugas/game/src/domain/element.hpp \
+ /usr/include/c++/15.2.1/bits/locale_classes.tcc \
+ /usr/include/c++/15.2.1/system_error \
+ /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/error_constants.h \
+ /usr/include/c++/15.2.1/stdexcept /usr/include/c++/15.2.1/streambuf \
+ /usr/include/c++/15.2.1/bits/streambuf.tcc \
+ /usr/include/c++/15.2.1/bits/basic_ios.h \
+ /usr/include/c++/15.2.1/bits/locale_facets.h \
+ /usr/include/c++/15.2.1/cwctype /usr/include/wctype.h \
+ /usr/include/bits/wctype-wchar.h \
+ /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/ctype_base.h \
+ /usr/include/c++/15.2.1/bits/streambuf_iterator.h \
+ /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/ctype_inline.h \
+ /usr/include/c++/15.2.1/bits/locale_facets.tcc \
+ /usr/include/c++/15.2.1/bits/basic_ios.tcc \
+ /usr/include/c++/15.2.1/bits/ostream.tcc /usr/include/c++/15.2.1/istream \
+ /usr/include/c++/15.2.1/bits/istream.tcc \
+ /home/tenyom/tugas/game/src/db/data_loader.hpp \
  /usr/include/c++/15.2.1/vector /usr/include/c++/15.2.1/bits/stl_vector.h \
  /usr/include/c++/15.2.1/bits/stl_bvector.h \
- /usr/include/c++/15.2.1/bits/vector.tcc \
- /home/tenyom/tugas/game/src/data/monsters.hpp \
- /usr/include/c++/15.2.1/map /usr/include/c++/15.2.1/bits/stl_tree.h \
+ /usr/include/c++/15.2.1/bits/vector.tcc /usr/include/c++/15.2.1/map \
+ /usr/include/c++/15.2.1/bits/stl_tree.h \
  /usr/include/c++/15.2.1/bits/node_handle.h \
  /usr/include/c++/15.2.1/bits/stl_map.h \
  /usr/include/c++/15.2.1/bits/stl_multimap.h \
- /usr/include/c++/15.2.1/bits/erase_if.h \
- /home/tenyom/tugas/game/src/data/../domain/enemy.hpp \
- /home/tenyom/tugas/game/src/data/weapons.hpp \
- /home/tenyom/tugas/game/src/data/items.hpp \
- /home/tenyom/tugas/game/src/data/upgrades.hpp \
+ /usr/include/c++/15.2.1/bits/erase_if.h /usr/include/c++/15.2.1/utility \
+ /usr/include/c++/15.2.1/bits/stl_relops.h \
+ /home/tenyom/tugas/game/src/db/../data/weapons.hpp \
+ /home/tenyom/tugas/game/src/db/../data/../domain/weapon.hpp \
+ /home/tenyom/tugas/game/src/db/../data/../domain/element.hpp \
+ /home/tenyom/tugas/game/src/db/../data/items.hpp \
+ /home/tenyom/tugas/game/src/db/../data/../domain/inventory.hpp \
+ /home/tenyom/tugas/game/src/db/../data/../domain/errors.hpp \
+ /home/tenyom/tugas/game/src/db/../data/monsters.hpp \
+ /home/tenyom/tugas/game/src/db/../data/../domain/enemy.hpp \
+ /home/tenyom/tugas/game/src/db/../data/upgrades.hpp \
+ /home/tenyom/tugas/game/src/domain/player.hpp \
  /home/tenyom/tugas/game/src/game/item_service.hpp \
  /home/tenyom/tugas/game/src/game/battle_service.hpp \
  /home/tenyom/tugas/game/src/game/shop_service.hpp \

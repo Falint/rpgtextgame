@@ -1,0 +1,3 @@
+/home/tenyom/tugas/game/build/_deps/json-subbuild/CMakeFiles/json-populate.dir
+/home/tenyom/tugas/game/build/_deps/json-subbuild/CMakeFiles/edit_cache.dir
+/home/tenyom/tugas/game/build/_deps/json-subbuild/CMakeFiles/rebuild_cache.dir

@@ -6,6 +6,8 @@ textrpg: \
   CMakeFiles/textrpg.dir/src/domain/inventory.cpp.o \
   CMakeFiles/textrpg.dir/src/domain/enemy.cpp.o \
   CMakeFiles/textrpg.dir/src/domain/player.cpp.o \
+  CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.o \
+  CMakeFiles/textrpg.dir/src/db/data_loader.cpp.o \
   CMakeFiles/textrpg.dir/src/data/monsters.cpp.o \
   CMakeFiles/textrpg.dir/src/data/weapons.cpp.o \
   CMakeFiles/textrpg.dir/src/data/items.cpp.o \
@@ -60,6 +62,10 @@ CMakeFiles/textrpg.dir/src/domain/inventory.cpp.o:
 CMakeFiles/textrpg.dir/src/domain/enemy.cpp.o:
 
 CMakeFiles/textrpg.dir/src/domain/player.cpp.o:
+
+CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.o:
+
+CMakeFiles/textrpg.dir/src/db/data_loader.cpp.o:
 
 CMakeFiles/textrpg.dir/src/data/monsters.cpp.o:
 

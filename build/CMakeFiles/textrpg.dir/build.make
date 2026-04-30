@@ -128,10 +128,38 @@ CMakeFiles/textrpg.dir/src/domain/player.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/textrpg.dir/src/domain/player.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/tenyom/tugas/game/src/domain/player.cpp -o CMakeFiles/textrpg.dir/src/domain/player.cpp.s
 
+CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.o: CMakeFiles/textrpg.dir/flags.make
+CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.o: /home/tenyom/tugas/game/src/db/json_helpers.cpp
+CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.o: CMakeFiles/textrpg.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.o -MF CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.o.d -o CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.o -c /home/tenyom/tugas/game/src/db/json_helpers.cpp
+
+CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/tenyom/tugas/game/src/db/json_helpers.cpp > CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.i
+
+CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/tenyom/tugas/game/src/db/json_helpers.cpp -o CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.s
+
+CMakeFiles/textrpg.dir/src/db/data_loader.cpp.o: CMakeFiles/textrpg.dir/flags.make
+CMakeFiles/textrpg.dir/src/db/data_loader.cpp.o: /home/tenyom/tugas/game/src/db/data_loader.cpp
+CMakeFiles/textrpg.dir/src/db/data_loader.cpp.o: CMakeFiles/textrpg.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/textrpg.dir/src/db/data_loader.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/textrpg.dir/src/db/data_loader.cpp.o -MF CMakeFiles/textrpg.dir/src/db/data_loader.cpp.o.d -o CMakeFiles/textrpg.dir/src/db/data_loader.cpp.o -c /home/tenyom/tugas/game/src/db/data_loader.cpp
+
+CMakeFiles/textrpg.dir/src/db/data_loader.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/textrpg.dir/src/db/data_loader.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/tenyom/tugas/game/src/db/data_loader.cpp > CMakeFiles/textrpg.dir/src/db/data_loader.cpp.i
+
+CMakeFiles/textrpg.dir/src/db/data_loader.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/textrpg.dir/src/db/data_loader.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/tenyom/tugas/game/src/db/data_loader.cpp -o CMakeFiles/textrpg.dir/src/db/data_loader.cpp.s
+
 CMakeFiles/textrpg.dir/src/data/monsters.cpp.o: CMakeFiles/textrpg.dir/flags.make
 CMakeFiles/textrpg.dir/src/data/monsters.cpp.o: /home/tenyom/tugas/game/src/data/monsters.cpp
 CMakeFiles/textrpg.dir/src/data/monsters.cpp.o: CMakeFiles/textrpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/textrpg.dir/src/data/monsters.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/textrpg.dir/src/data/monsters.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/textrpg.dir/src/data/monsters.cpp.o -MF CMakeFiles/textrpg.dir/src/data/monsters.cpp.o.d -o CMakeFiles/textrpg.dir/src/data/monsters.cpp.o -c /home/tenyom/tugas/game/src/data/monsters.cpp
 
 CMakeFiles/textrpg.dir/src/data/monsters.cpp.i: cmake_force
@@ -145,7 +173,7 @@ CMakeFiles/textrpg.dir/src/data/monsters.cpp.s: cmake_force
 CMakeFiles/textrpg.dir/src/data/weapons.cpp.o: CMakeFiles/textrpg.dir/flags.make
 CMakeFiles/textrpg.dir/src/data/weapons.cpp.o: /home/tenyom/tugas/game/src/data/weapons.cpp
 CMakeFiles/textrpg.dir/src/data/weapons.cpp.o: CMakeFiles/textrpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/textrpg.dir/src/data/weapons.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/textrpg.dir/src/data/weapons.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/textrpg.dir/src/data/weapons.cpp.o -MF CMakeFiles/textrpg.dir/src/data/weapons.cpp.o.d -o CMakeFiles/textrpg.dir/src/data/weapons.cpp.o -c /home/tenyom/tugas/game/src/data/weapons.cpp
 
 CMakeFiles/textrpg.dir/src/data/weapons.cpp.i: cmake_force
@@ -159,7 +187,7 @@ CMakeFiles/textrpg.dir/src/data/weapons.cpp.s: cmake_force
 CMakeFiles/textrpg.dir/src/data/items.cpp.o: CMakeFiles/textrpg.dir/flags.make
 CMakeFiles/textrpg.dir/src/data/items.cpp.o: /home/tenyom/tugas/game/src/data/items.cpp
 CMakeFiles/textrpg.dir/src/data/items.cpp.o: CMakeFiles/textrpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/textrpg.dir/src/data/items.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/textrpg.dir/src/data/items.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/textrpg.dir/src/data/items.cpp.o -MF CMakeFiles/textrpg.dir/src/data/items.cpp.o.d -o CMakeFiles/textrpg.dir/src/data/items.cpp.o -c /home/tenyom/tugas/game/src/data/items.cpp
 
 CMakeFiles/textrpg.dir/src/data/items.cpp.i: cmake_force
@@ -173,7 +201,7 @@ CMakeFiles/textrpg.dir/src/data/items.cpp.s: cmake_force
 CMakeFiles/textrpg.dir/src/data/upgrades.cpp.o: CMakeFiles/textrpg.dir/flags.make
 CMakeFiles/textrpg.dir/src/data/upgrades.cpp.o: /home/tenyom/tugas/game/src/data/upgrades.cpp
 CMakeFiles/textrpg.dir/src/data/upgrades.cpp.o: CMakeFiles/textrpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/textrpg.dir/src/data/upgrades.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/textrpg.dir/src/data/upgrades.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/textrpg.dir/src/data/upgrades.cpp.o -MF CMakeFiles/textrpg.dir/src/data/upgrades.cpp.o.d -o CMakeFiles/textrpg.dir/src/data/upgrades.cpp.o -c /home/tenyom/tugas/game/src/data/upgrades.cpp
 
 CMakeFiles/textrpg.dir/src/data/upgrades.cpp.i: cmake_force
@@ -187,7 +215,7 @@ CMakeFiles/textrpg.dir/src/data/upgrades.cpp.s: cmake_force
 CMakeFiles/textrpg.dir/src/game/item_service.cpp.o: CMakeFiles/textrpg.dir/flags.make
 CMakeFiles/textrpg.dir/src/game/item_service.cpp.o: /home/tenyom/tugas/game/src/game/item_service.cpp
 CMakeFiles/textrpg.dir/src/game/item_service.cpp.o: CMakeFiles/textrpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/textrpg.dir/src/game/item_service.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/textrpg.dir/src/game/item_service.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/textrpg.dir/src/game/item_service.cpp.o -MF CMakeFiles/textrpg.dir/src/game/item_service.cpp.o.d -o CMakeFiles/textrpg.dir/src/game/item_service.cpp.o -c /home/tenyom/tugas/game/src/game/item_service.cpp
 
 CMakeFiles/textrpg.dir/src/game/item_service.cpp.i: cmake_force
@@ -201,7 +229,7 @@ CMakeFiles/textrpg.dir/src/game/item_service.cpp.s: cmake_force
 CMakeFiles/textrpg.dir/src/game/battle_service.cpp.o: CMakeFiles/textrpg.dir/flags.make
 CMakeFiles/textrpg.dir/src/game/battle_service.cpp.o: /home/tenyom/tugas/game/src/game/battle_service.cpp
 CMakeFiles/textrpg.dir/src/game/battle_service.cpp.o: CMakeFiles/textrpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/textrpg.dir/src/game/battle_service.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/textrpg.dir/src/game/battle_service.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/textrpg.dir/src/game/battle_service.cpp.o -MF CMakeFiles/textrpg.dir/src/game/battle_service.cpp.o.d -o CMakeFiles/textrpg.dir/src/game/battle_service.cpp.o -c /home/tenyom/tugas/game/src/game/battle_service.cpp
 
 CMakeFiles/textrpg.dir/src/game/battle_service.cpp.i: cmake_force
@@ -215,7 +243,7 @@ CMakeFiles/textrpg.dir/src/game/battle_service.cpp.s: cmake_force
 CMakeFiles/textrpg.dir/src/game/shop_service.cpp.o: CMakeFiles/textrpg.dir/flags.make
 CMakeFiles/textrpg.dir/src/game/shop_service.cpp.o: /home/tenyom/tugas/game/src/game/shop_service.cpp
 CMakeFiles/textrpg.dir/src/game/shop_service.cpp.o: CMakeFiles/textrpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/textrpg.dir/src/game/shop_service.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/textrpg.dir/src/game/shop_service.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/textrpg.dir/src/game/shop_service.cpp.o -MF CMakeFiles/textrpg.dir/src/game/shop_service.cpp.o.d -o CMakeFiles/textrpg.dir/src/game/shop_service.cpp.o -c /home/tenyom/tugas/game/src/game/shop_service.cpp
 
 CMakeFiles/textrpg.dir/src/game/shop_service.cpp.i: cmake_force
@@ -229,7 +257,7 @@ CMakeFiles/textrpg.dir/src/game/shop_service.cpp.s: cmake_force
 CMakeFiles/textrpg.dir/src/tui/terminal.cpp.o: CMakeFiles/textrpg.dir/flags.make
 CMakeFiles/textrpg.dir/src/tui/terminal.cpp.o: /home/tenyom/tugas/game/src/tui/terminal.cpp
 CMakeFiles/textrpg.dir/src/tui/terminal.cpp.o: CMakeFiles/textrpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/textrpg.dir/src/tui/terminal.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/textrpg.dir/src/tui/terminal.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/textrpg.dir/src/tui/terminal.cpp.o -MF CMakeFiles/textrpg.dir/src/tui/terminal.cpp.o.d -o CMakeFiles/textrpg.dir/src/tui/terminal.cpp.o -c /home/tenyom/tugas/game/src/tui/terminal.cpp
 
 CMakeFiles/textrpg.dir/src/tui/terminal.cpp.i: cmake_force
@@ -243,7 +271,7 @@ CMakeFiles/textrpg.dir/src/tui/terminal.cpp.s: cmake_force
 CMakeFiles/textrpg.dir/src/tui/renderer.cpp.o: CMakeFiles/textrpg.dir/flags.make
 CMakeFiles/textrpg.dir/src/tui/renderer.cpp.o: /home/tenyom/tugas/game/src/tui/renderer.cpp
 CMakeFiles/textrpg.dir/src/tui/renderer.cpp.o: CMakeFiles/textrpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/textrpg.dir/src/tui/renderer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/textrpg.dir/src/tui/renderer.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/textrpg.dir/src/tui/renderer.cpp.o -MF CMakeFiles/textrpg.dir/src/tui/renderer.cpp.o.d -o CMakeFiles/textrpg.dir/src/tui/renderer.cpp.o -c /home/tenyom/tugas/game/src/tui/renderer.cpp
 
 CMakeFiles/textrpg.dir/src/tui/renderer.cpp.i: cmake_force
@@ -257,7 +285,7 @@ CMakeFiles/textrpg.dir/src/tui/renderer.cpp.s: cmake_force
 CMakeFiles/textrpg.dir/src/tui/screens.cpp.o: CMakeFiles/textrpg.dir/flags.make
 CMakeFiles/textrpg.dir/src/tui/screens.cpp.o: /home/tenyom/tugas/game/src/tui/screens.cpp
 CMakeFiles/textrpg.dir/src/tui/screens.cpp.o: CMakeFiles/textrpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/textrpg.dir/src/tui/screens.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/textrpg.dir/src/tui/screens.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/textrpg.dir/src/tui/screens.cpp.o -MF CMakeFiles/textrpg.dir/src/tui/screens.cpp.o.d -o CMakeFiles/textrpg.dir/src/tui/screens.cpp.o -c /home/tenyom/tugas/game/src/tui/screens.cpp
 
 CMakeFiles/textrpg.dir/src/tui/screens.cpp.i: cmake_force
@@ -271,7 +299,7 @@ CMakeFiles/textrpg.dir/src/tui/screens.cpp.s: cmake_force
 CMakeFiles/textrpg.dir/src/tui/screens2.cpp.o: CMakeFiles/textrpg.dir/flags.make
 CMakeFiles/textrpg.dir/src/tui/screens2.cpp.o: /home/tenyom/tugas/game/src/tui/screens2.cpp
 CMakeFiles/textrpg.dir/src/tui/screens2.cpp.o: CMakeFiles/textrpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/textrpg.dir/src/tui/screens2.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/textrpg.dir/src/tui/screens2.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/textrpg.dir/src/tui/screens2.cpp.o -MF CMakeFiles/textrpg.dir/src/tui/screens2.cpp.o.d -o CMakeFiles/textrpg.dir/src/tui/screens2.cpp.o -c /home/tenyom/tugas/game/src/tui/screens2.cpp
 
 CMakeFiles/textrpg.dir/src/tui/screens2.cpp.i: cmake_force
@@ -285,7 +313,7 @@ CMakeFiles/textrpg.dir/src/tui/screens2.cpp.s: cmake_force
 CMakeFiles/textrpg.dir/src/tui/screens3.cpp.o: CMakeFiles/textrpg.dir/flags.make
 CMakeFiles/textrpg.dir/src/tui/screens3.cpp.o: /home/tenyom/tugas/game/src/tui/screens3.cpp
 CMakeFiles/textrpg.dir/src/tui/screens3.cpp.o: CMakeFiles/textrpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/textrpg.dir/src/tui/screens3.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/textrpg.dir/src/tui/screens3.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/textrpg.dir/src/tui/screens3.cpp.o -MF CMakeFiles/textrpg.dir/src/tui/screens3.cpp.o.d -o CMakeFiles/textrpg.dir/src/tui/screens3.cpp.o -c /home/tenyom/tugas/game/src/tui/screens3.cpp
 
 CMakeFiles/textrpg.dir/src/tui/screens3.cpp.i: cmake_force
@@ -299,7 +327,7 @@ CMakeFiles/textrpg.dir/src/tui/screens3.cpp.s: cmake_force
 CMakeFiles/textrpg.dir/src/tui/app.cpp.o: CMakeFiles/textrpg.dir/flags.make
 CMakeFiles/textrpg.dir/src/tui/app.cpp.o: /home/tenyom/tugas/game/src/tui/app.cpp
 CMakeFiles/textrpg.dir/src/tui/app.cpp.o: CMakeFiles/textrpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/textrpg.dir/src/tui/app.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/textrpg.dir/src/tui/app.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/textrpg.dir/src/tui/app.cpp.o -MF CMakeFiles/textrpg.dir/src/tui/app.cpp.o.d -o CMakeFiles/textrpg.dir/src/tui/app.cpp.o -c /home/tenyom/tugas/game/src/tui/app.cpp
 
 CMakeFiles/textrpg.dir/src/tui/app.cpp.i: cmake_force
@@ -316,6 +344,8 @@ textrpg_OBJECTS = \
 "CMakeFiles/textrpg.dir/src/domain/inventory.cpp.o" \
 "CMakeFiles/textrpg.dir/src/domain/enemy.cpp.o" \
 "CMakeFiles/textrpg.dir/src/domain/player.cpp.o" \
+"CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.o" \
+"CMakeFiles/textrpg.dir/src/db/data_loader.cpp.o" \
 "CMakeFiles/textrpg.dir/src/data/monsters.cpp.o" \
 "CMakeFiles/textrpg.dir/src/data/weapons.cpp.o" \
 "CMakeFiles/textrpg.dir/src/data/items.cpp.o" \
@@ -337,6 +367,8 @@ textrpg: CMakeFiles/textrpg.dir/src/main.cpp.o
 textrpg: CMakeFiles/textrpg.dir/src/domain/inventory.cpp.o
 textrpg: CMakeFiles/textrpg.dir/src/domain/enemy.cpp.o
 textrpg: CMakeFiles/textrpg.dir/src/domain/player.cpp.o
+textrpg: CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.o
+textrpg: CMakeFiles/textrpg.dir/src/db/data_loader.cpp.o
 textrpg: CMakeFiles/textrpg.dir/src/data/monsters.cpp.o
 textrpg: CMakeFiles/textrpg.dir/src/data/weapons.cpp.o
 textrpg: CMakeFiles/textrpg.dir/src/data/items.cpp.o
@@ -353,7 +385,7 @@ textrpg: CMakeFiles/textrpg.dir/src/tui/app.cpp.o
 textrpg: CMakeFiles/textrpg.dir/build.make
 textrpg: CMakeFiles/textrpg.dir/compiler_depend.ts
 textrpg: CMakeFiles/textrpg.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Linking CXX executable textrpg"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Linking CXX executable textrpg"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/textrpg.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

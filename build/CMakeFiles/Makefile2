@@ -64,19 +64,41 @@ CMAKE_BINARY_DIR = /home/tenyom/tugas/game/build
 
 # The main recursive "all" target.
 all: CMakeFiles/textrpg.dir/all
+all: _deps/json-build/all
 .PHONY : all
 
 # The main recursive "codegen" target.
 codegen: CMakeFiles/textrpg.dir/codegen
+codegen: _deps/json-build/codegen
 .PHONY : codegen
 
 # The main recursive "preinstall" target.
-preinstall:
+preinstall: _deps/json-build/preinstall
 .PHONY : preinstall
 
 # The main recursive "clean" target.
 clean: CMakeFiles/textrpg.dir/clean
+clean: _deps/json-build/clean
 .PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory _deps/json-build
+
+# Recursive "all" directory target.
+_deps/json-build/all:
+.PHONY : _deps/json-build/all
+
+# Recursive "codegen" directory target.
+_deps/json-build/codegen:
+.PHONY : _deps/json-build/codegen
+
+# Recursive "preinstall" directory target.
+_deps/json-build/preinstall:
+.PHONY : _deps/json-build/preinstall
+
+# Recursive "clean" directory target.
+_deps/json-build/clean:
+.PHONY : _deps/json-build/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/textrpg.dir
@@ -85,12 +107,12 @@ clean: CMakeFiles/textrpg.dir/clean
 CMakeFiles/textrpg.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/textrpg.dir/build.make CMakeFiles/textrpg.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/textrpg.dir/build.make CMakeFiles/textrpg.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18 "Built target textrpg"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 "Built target textrpg"
 .PHONY : CMakeFiles/textrpg.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/textrpg.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/tenyom/tugas/game/build/CMakeFiles 18
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/tenyom/tugas/game/build/CMakeFiles 20
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/textrpg.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/tenyom/tugas/game/build/CMakeFiles 0
 .PHONY : CMakeFiles/textrpg.dir/rule
@@ -102,7 +124,7 @@ textrpg: CMakeFiles/textrpg.dir/rule
 # codegen rule for target.
 CMakeFiles/textrpg.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/textrpg.dir/build.make CMakeFiles/textrpg.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18 "Finished codegen for target textrpg"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/tenyom/tugas/game/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 "Finished codegen for target textrpg"
 .PHONY : CMakeFiles/textrpg.dir/codegen
 
 # clean rule for target.

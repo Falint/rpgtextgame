@@ -225,6 +225,54 @@ src/data/weapons.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/textrpg.dir/build.make CMakeFiles/textrpg.dir/src/data/weapons.cpp.s
 .PHONY : src/data/weapons.cpp.s
 
+src/db/data_loader.o: src/db/data_loader.cpp.o
+.PHONY : src/db/data_loader.o
+
+# target to build an object file
+src/db/data_loader.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/textrpg.dir/build.make CMakeFiles/textrpg.dir/src/db/data_loader.cpp.o
+.PHONY : src/db/data_loader.cpp.o
+
+src/db/data_loader.i: src/db/data_loader.cpp.i
+.PHONY : src/db/data_loader.i
+
+# target to preprocess a source file
+src/db/data_loader.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/textrpg.dir/build.make CMakeFiles/textrpg.dir/src/db/data_loader.cpp.i
+.PHONY : src/db/data_loader.cpp.i
+
+src/db/data_loader.s: src/db/data_loader.cpp.s
+.PHONY : src/db/data_loader.s
+
+# target to generate assembly for a file
+src/db/data_loader.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/textrpg.dir/build.make CMakeFiles/textrpg.dir/src/db/data_loader.cpp.s
+.PHONY : src/db/data_loader.cpp.s
+
+src/db/json_helpers.o: src/db/json_helpers.cpp.o
+.PHONY : src/db/json_helpers.o
+
+# target to build an object file
+src/db/json_helpers.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/textrpg.dir/build.make CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.o
+.PHONY : src/db/json_helpers.cpp.o
+
+src/db/json_helpers.i: src/db/json_helpers.cpp.i
+.PHONY : src/db/json_helpers.i
+
+# target to preprocess a source file
+src/db/json_helpers.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/textrpg.dir/build.make CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.i
+.PHONY : src/db/json_helpers.cpp.i
+
+src/db/json_helpers.s: src/db/json_helpers.cpp.s
+.PHONY : src/db/json_helpers.s
+
+# target to generate assembly for a file
+src/db/json_helpers.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/textrpg.dir/build.make CMakeFiles/textrpg.dir/src/db/json_helpers.cpp.s
+.PHONY : src/db/json_helpers.cpp.s
+
 src/domain/enemy.o: src/domain/enemy.cpp.o
 .PHONY : src/domain/enemy.o
 
@@ -558,6 +606,12 @@ help:
 	@echo "... src/data/weapons.o"
 	@echo "... src/data/weapons.i"
 	@echo "... src/data/weapons.s"
+	@echo "... src/db/data_loader.o"
+	@echo "... src/db/data_loader.i"
+	@echo "... src/db/data_loader.s"
+	@echo "... src/db/json_helpers.o"
+	@echo "... src/db/json_helpers.i"
+	@echo "... src/db/json_helpers.s"
 	@echo "... src/domain/enemy.o"
 	@echo "... src/domain/enemy.i"
 	@echo "... src/domain/enemy.s"

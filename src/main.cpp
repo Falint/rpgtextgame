@@ -1,6 +1,8 @@
 #include <ctime>
 #include <memory>
+#include <iostream>
 
+#include "db/data_loader.hpp"
 #include "domain/player.hpp"
 #include "data/monsters.hpp"
 #include "data/weapons.hpp"
@@ -14,7 +16,10 @@
 int main() {
     std::srand(static_cast<unsigned>(std::time(nullptr)));
 
-    // ── Registries ────────────────────────────────────────────────────────────
+    // ── Data path ────────────────────────────────────────────────────────────
+    DataLoader::setBasePath("data/json");
+
+    // ── Registries (loaded from JSON files) ──────────────────────────────────
     MonsterRegistry monsters;
     WeaponRegistry  weapons;
     ItemRegistry    items;

@@ -155,4 +155,12 @@ CMakeFiles/textrpg.dir/src/data/items.cpp.o: \
  /home/tenyom/tugas/game/src/data/../domain/inventory.hpp \
  /home/tenyom/tugas/game/src/data/../domain/errors.hpp \
  /home/tenyom/tugas/game/src/data/../domain/weapon.hpp \
- /home/tenyom/tugas/game/src/data/../domain/element.hpp
+ /home/tenyom/tugas/game/src/data/../domain/element.hpp \
+ /home/tenyom/tugas/game/src/data/../db/data_loader.hpp \
+ /usr/include/c++/15.2.1/utility \
+ /usr/include/c++/15.2.1/bits/stl_relops.h \
+ /usr/include/c++/15.2.1/stdexcept \
+ /home/tenyom/tugas/game/src/data/../db/../data/weapons.hpp \
+ /home/tenyom/tugas/game/src/data/../db/../data/monsters.hpp \
+ /home/tenyom/tugas/game/src/data/../db/../data/../domain/enemy.hpp \
+ /home/tenyom/tugas/game/src/data/../db/../data/upgrades.hpp

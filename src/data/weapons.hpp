@@ -51,4 +51,5 @@ private:
     void initShopStock();
     std::map<std::string, WeaponTemplate> weapons_;
     std::map<std::string, int>            shopStock_;
+    std::vector<std::string>              shopOrder_;
 };

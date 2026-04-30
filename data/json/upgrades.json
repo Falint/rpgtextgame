@@ -1,0 +1,220 @@
+{
+  "upgrades": [
+    {
+      "weaponId": "iron_sword",
+      "fromTier": 1, "toTier": 2,
+      "goldCost": 80, "damageBonus": 3,
+      "materials": [
+        { "itemId": "goblin_fang", "quantity": 3 },
+        { "itemId": "slime_gel",   "quantity": 2 }
+      ]
+    },
+    {
+      "weaponId": "iron_sword",
+      "fromTier": 2, "toTier": 3,
+      "goldCost": 150, "damageBonus": 4,
+      "materials": [
+        { "itemId": "goblin_fang", "quantity": 5 },
+        { "itemId": "wolf_fang",   "quantity": 3 }
+      ]
+    },
+    {
+      "weaponId": "iron_sword",
+      "fromTier": 3, "toTier": 4,
+      "goldCost": 300, "damageBonus": 5,
+      "materials": [
+        { "itemId": "orc_tusk",       "quantity": 3 },
+        { "itemId": "bone_fragment",  "quantity": 5 }
+      ]
+    },
+    {
+      "weaponId": "iron_sword",
+      "fromTier": 4, "toTier": 5,
+      "goldCost": 500, "damageBonus": 8,
+      "materials": [
+        { "itemId": "legendary_ore", "quantity": 1 },
+        { "itemId": "orc_tusk",      "quantity": 5 }
+      ]
+    },
+    {
+      "weaponId": "fire_blade",
+      "fromTier": 1, "toTier": 2,
+      "goldCost": 120, "damageBonus": 4,
+      "materials": [
+        { "itemId": "fire_essence", "quantity": 2 },
+        { "itemId": "ember_stone",  "quantity": 1 }
+      ]
+    },
+    {
+      "weaponId": "fire_blade",
+      "fromTier": 2, "toTier": 3,
+      "goldCost": 250, "damageBonus": 5,
+      "materials": [
+        { "itemId": "fire_essence", "quantity": 4 },
+        { "itemId": "ember_stone",  "quantity": 3 }
+      ]
+    },
+    {
+      "weaponId": "fire_blade",
+      "fromTier": 3, "toTier": 4,
+      "goldCost": 450, "damageBonus": 7,
+      "materials": [
+        { "itemId": "fire_essence", "quantity": 6 },
+        { "itemId": "dragon_fang",  "quantity": 1 }
+      ]
+    },
+    {
+      "weaponId": "fire_blade",
+      "fromTier": 4, "toTier": 5,
+      "goldCost": 800, "damageBonus": 10,
+      "materials": [
+        { "itemId": "dragon_scale",  "quantity": 2 },
+        { "itemId": "legendary_ore", "quantity": 1 }
+      ]
+    },
+    {
+      "weaponId": "aqua_saber",
+      "fromTier": 1, "toTier": 2,
+      "goldCost": 120, "damageBonus": 4,
+      "materials": [
+        { "itemId": "water_essence", "quantity": 2 },
+        { "itemId": "aqua_crystal",  "quantity": 1 }
+      ]
+    },
+    {
+      "weaponId": "aqua_saber",
+      "fromTier": 2, "toTier": 3,
+      "goldCost": 250, "damageBonus": 5,
+      "materials": [
+        { "itemId": "water_essence", "quantity": 4 },
+        { "itemId": "aqua_crystal",  "quantity": 3 }
+      ]
+    },
+    {
+      "weaponId": "aqua_saber",
+      "fromTier": 3, "toTier": 4,
+      "goldCost": 450, "damageBonus": 7,
+      "materials": [
+        { "itemId": "water_essence",  "quantity": 6 },
+        { "itemId": "deep_sea_pearl", "quantity": 1 }
+      ]
+    },
+    {
+      "weaponId": "aqua_saber",
+      "fromTier": 4, "toTier": 5,
+      "goldCost": 800, "damageBonus": 10,
+      "materials": [
+        { "itemId": "kraken_tentacle", "quantity": 2 },
+        { "itemId": "legendary_ore",   "quantity": 1 }
+      ]
+    },
+    {
+      "weaponId": "earth_cleaver",
+      "fromTier": 1, "toTier": 2,
+      "goldCost": 120, "damageBonus": 4,
+      "materials": [
+        { "itemId": "earth_essence", "quantity": 2 },
+        { "itemId": "stone_core",    "quantity": 1 }
+      ]
+    },
+    {
+      "weaponId": "earth_cleaver",
+      "fromTier": 2, "toTier": 3,
+      "goldCost": 250, "damageBonus": 5,
+      "materials": [
+        { "itemId": "earth_essence", "quantity": 4 },
+        { "itemId": "stone_core",    "quantity": 2 }
+      ]
+    },
+    {
+      "weaponId": "earth_cleaver",
+      "fromTier": 3, "toTier": 4,
+      "goldCost": 450, "damageBonus": 7,
+      "materials": [
+        { "itemId": "earth_essence", "quantity": 6 },
+        { "itemId": "adamant_ore",   "quantity": 2 }
+      ]
+    },
+    {
+      "weaponId": "earth_cleaver",
+      "fromTier": 4, "toTier": 5,
+      "goldCost": 800, "damageBonus": 10,
+      "materials": [
+        { "itemId": "titan_heart",   "quantity": 1 },
+        { "itemId": "legendary_ore", "quantity": 1 }
+      ]
+    },
+    {
+      "weaponId": "wind_cutter",
+      "fromTier": 1, "toTier": 2,
+      "goldCost": 100, "damageBonus": 3,
+      "materials": [
+        { "itemId": "wind_essence",  "quantity": 2 },
+        { "itemId": "gale_feather",  "quantity": 2 }
+      ]
+    },
+    {
+      "weaponId": "wind_cutter",
+      "fromTier": 2, "toTier": 3,
+      "goldCost": 220, "damageBonus": 4,
+      "materials": [
+        { "itemId": "wind_essence",  "quantity": 4 },
+        { "itemId": "gale_feather",  "quantity": 4 }
+      ]
+    },
+    {
+      "weaponId": "wind_cutter",
+      "fromTier": 3, "toTier": 4,
+      "goldCost": 400, "damageBonus": 6,
+      "materials": [
+        { "itemId": "wind_essence", "quantity": 6 },
+        { "itemId": "bat_wing",     "quantity": 10 }
+      ]
+    },
+    {
+      "weaponId": "wind_cutter",
+      "fromTier": 4, "toTier": 5,
+      "goldCost": 700, "damageBonus": 9,
+      "materials": [
+        { "itemId": "gale_feather",  "quantity": 10 },
+        { "itemId": "legendary_ore", "quantity": 1 }
+      ]
+    },
+    {
+      "weaponId": "iron_axe",
+      "fromTier": 1, "toTier": 2,
+      "goldCost": 100, "damageBonus": 4,
+      "materials": [
+        { "itemId": "wolf_pelt",      "quantity": 3 },
+        { "itemId": "bone_fragment",  "quantity": 3 }
+      ]
+    },
+    {
+      "weaponId": "iron_axe",
+      "fromTier": 2, "toTier": 3,
+      "goldCost": 200, "damageBonus": 5,
+      "materials": [
+        { "itemId": "orc_tusk",   "quantity": 2 },
+        { "itemId": "wolf_fang",  "quantity": 5 }
+      ]
+    },
+    {
+      "weaponId": "iron_axe",
+      "fromTier": 3, "toTier": 4,
+      "goldCost": 400, "damageBonus": 7,
+      "materials": [
+        { "itemId": "orc_tusk",   "quantity": 5 },
+        { "itemId": "stone_core", "quantity": 2 }
+      ]
+    },
+    {
+      "weaponId": "iron_axe",
+      "fromTier": 4, "toTier": 5,
+      "goldCost": 700, "damageBonus": 10,
+      "materials": [
+        { "itemId": "adamant_ore",   "quantity": 3 },
+        { "itemId": "legendary_ore", "quantity": 1 }
+      ]
+    }
+  ]
+}
